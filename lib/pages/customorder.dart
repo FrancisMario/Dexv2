@@ -404,7 +404,8 @@ class _CustomOrderState extends State<CustomOrder> {
                   "pickup_date": _pickupDate,
                   "pickup_time": _pickupTime,
                   "pickup_location": _pickupLocation,
-                  "delivery_location": _deliveryLocation
+                  "user_id": user.uid,
+                  "status": "submitted",
                 }).then((value)  {
                   print("level three");
                    showMessage("Everything Cool", "Apperently, everything was cool");

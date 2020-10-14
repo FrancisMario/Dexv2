@@ -1,4 +1,6 @@
 import 'package:dexv2/pages/customorder.dart';
+import 'package:dexv2/pages/trackorders.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -10,14 +12,17 @@ class Orders extends StatefulWidget {
 }
 
 class _OrdersState extends State<Orders> {
+  FirebaseAuth auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
+    User user = auth.currentUser;
     return Scaffold(
       body: CustomScrollView(
         physics: BouncingScrollPhysics(),
         slivers: <Widget>[
           SliverAppBar(
-            title: Text("Orders"),
+            title: Text(user.displayName),
             expandedHeight: MediaQuery.of(context).size.height / 3,
             floating: false,
             pinned: true,
@@ -45,7 +50,7 @@ class _OrdersState extends State<Orders> {
       box("Custom Orders", "Make custom delivery Orders ", CustomOrder()),
     );
     listItems.add(
-      box("Track Orders", "Track your ongoing orders", CustomOrder()),
+      box("Track Orders", "Track your ongoing orders", TrackOrders()),
     );
 
     return listItems;

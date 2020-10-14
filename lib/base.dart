@@ -3,6 +3,7 @@ import 'package:dexv2/notifications.dart';
 import 'package:dexv2/orders.dart';
 import 'package:dexv2/pages/addSmartAddress.dart';
 import 'package:dexv2/pages/category.dart';
+import 'package:dexv2/pages/detailedShopView.dart';
 import 'package:dexv2/pages/marketView.dart';
 import 'package:dexv2/pages/myaddress.dart';
 import 'package:dexv2/pages/normalAddress.dart';
@@ -58,9 +59,10 @@ class _Base extends State<Base> {
                 Category(),
                 // Address(),
                 Address(),
-                Notifications(),
+                // Notifications(),
                 // MyAddress(),
                 // MarketView(),
+                DetailedEntityView(ent_des: "hahaha ", ent_id: "9PjTe3g0DA9LkntzjoaH",ent_img: "https://miro.medium.com/max/1200/1*mk1-6aYaf_Bes1E3Imhc0A.jpeg",ent_name: "Resturant",)
                 // SmartAddress(),
                 // NormalAddress(),
               ],
