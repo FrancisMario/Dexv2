@@ -24,11 +24,11 @@ class _AddressState extends State<Address> {
     return Scaffold(
       // style: Theme.of(context).textTheme.headline2,
       // textAlign: TextAlign.center,
-      floatingActionButton: Add(),
+      // floatingActionButton: Add(),
       body: Column(
         children: [
           Card(title:"My Addresses", description: "Addresses That belong to you.",route: MyAddress()),
-          Card(title:"People",description: "Addresses That belong to your contacts.", route: MyPeople())
+          // Card(title:"People",description: "Addresses That belong to your contacts.", route: MyPeople())
         ],
       )
       );
@@ -58,55 +58,60 @@ class _AddressState extends State<Address> {
       },
           child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Container(
-          width: MediaQuery.of(context).size.width / 1.1,
-          height: MediaQuery.of(context).size.height / 5,
-          // height: 50,
-          decoration: BoxDecoration(
-            color: Colors.blueAccent,
-            borderRadius: BorderRadius.circular(10)
-          ),
-          child:Column(
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(title, style: TextStyle(
-                        fontSize: 20,
-                        fontWeight:FontWeight.w900,
-                        color: Colors.white
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child:Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Align( alignment: Alignment.centerRight ,child: Icon(Icons.info,size: 30,color: Colors.white,)),
-                    )
-                  ),
-                ],
-              ),
-                Row(
-                    children: <Widget>[
-                       Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(description, style: TextStyle(
-                        fontSize: 15,
-                        fontWeight:FontWeight.w500,
-                        color: Colors.white
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                    ],
-                  ),
+        child: Center(
+          child: Container(
+            width: MediaQuery.of(context).size.width / 1.1,
+            height: MediaQuery.of(context).size.height / 5,
+            // height: 50,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(color: Colors.grey,blurRadius: 10, offset: Offset(2, 2) ),
             ],
+            ),
+            child:Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(title, style: TextStyle(
+                          fontSize: 20,
+                          fontWeight:FontWeight.w900,
+                          color: Colors.red
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child:Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Align( alignment: Alignment.centerRight ,child: Icon(Icons.info,size: 30,color: Colors.red,)),
+                      )
+                    ),
+                  ],
+                ),
+                  Row(
+                      children: <Widget>[
+                         Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(description, style: TextStyle(
+                          fontSize: 16,
+                          fontWeight:FontWeight.w500,
+                          color: Colors.black38
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                      ],
+                    ),
+              ],
+            ),
           ),
         ),
       ),

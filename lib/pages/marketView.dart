@@ -6,17 +6,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
 
+
+
 class MarketView extends StatefulWidget {
   final int categoryId;
   final String categoryName;
   final String categoryImage;
-  
 
   MarketView(
       {Key key,
-      this.categoryId ,
-      this.categoryName ,
-      this.categoryImage })
+      this.categoryId,
+      this.categoryName = "Resturants",
+      this.categoryImage = "Resturants"})
       : super(key: key);
 
   @override
@@ -26,7 +27,6 @@ class MarketView extends StatefulWidget {
 class _MarketViewState extends State<MarketView> {
   Future _future = null;
   Location location = new Location();
-  
 
   @override
   void initState() {
@@ -67,14 +67,12 @@ class _MarketViewState extends State<MarketView> {
         } else if (snapshot.hasError) {
           return Text("${snapshot.error}");
         }
-        return 
-        
-        Center(
-          // child: body(list),
-          child:
-          //  Text("Loading"),
-         CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.blue))
-        );
+        return Center(
+            // child: body(list),
+            child:
+                //  Text("Loading"),
+                CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue)));
       },
     );
   }
@@ -84,7 +82,7 @@ class _MarketViewState extends State<MarketView> {
     print("ds");
     return FirebaseFirestore.instance
         .collection("markets")
-        .where("category", isEqualTo: widget.categoryId)
+        // .where("category", isEqualTo: widget.categoryId)
         .get();
     // return  FirebaseFirestore.instance.collection("products").snapshots().toList();
     // .then((value) => {
@@ -115,15 +113,15 @@ class _MarketViewState extends State<MarketView> {
         physics: BouncingScrollPhysics(),
         slivers: <Widget>[
           SliverAppBar(
-            title: Text(widget.categoryName),
+            title: Text("Eats"),
             expandedHeight: MediaQuery.of(context).size.height / 4.5,
             floating: false,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
               centerTitle: true,
               // title: Text("Title"),
-              background: Image.network(
-                widget.categoryImage
+              background: Image.asset(
+                "assets/images/dex-eats-banner.png"
                 //TODO
                 ,
                 fit: BoxFit.cover,
@@ -180,13 +178,13 @@ class _MarketViewState extends State<MarketView> {
 
   Widget anotherBox(data) {
     QueryDocumentSnapshot dataa = data;
-    String address = "Loading Address";
+    String address = "Senegambia";
     GeoPoint geolocation = dataa.get("location");
 
+    final coordinates =
+        new Coordinates(geolocation.latitude, geolocation.longitude);
 
-    final coordinates = new Coordinates(geolocation.latitude, geolocation.longitude);
-
-     Geocoder.local.findAddressesFromCoordinates(coordinates).then((value) {
+    Geocoder.local.findAddressesFromCoordinates(coordinates).then((value) {
       address = value.first.featureName;
       print(value.first.featureName);
       setState(() {});
@@ -197,37 +195,51 @@ class _MarketViewState extends State<MarketView> {
         onTap: () {
           Navigator.of(context)
               .push(MaterialPageRoute(builder: (BuildContext context) {
-            return DetailedEntityView(ent_des: dataa.get("description"), ent_id: dataa.id ,ent_img: dataa.get("image"),ent_name: dataa.get("name"),)
-;
+            return DetailedEntityView(
+              ent_des: dataa.get("description"),
+              ent_id: dataa.id,
+              ent_img: dataa.get("image"),
+              ent_name: dataa.get("name"),
+            );
           }));
         },
         child: Container(
           width: MediaQuery.of(context).size.width / 1.3,
-          height: MediaQuery.of(context).size.height / 4,
+          height: MediaQuery.of(context).size.height / 4.5,
           decoration: BoxDecoration(
-            color: Colors.deepOrange,
+            // border: Border.all(color: Colors.black12),
+            boxShadow: [
+                BoxShadow(color: Colors.grey.withOpacity(0.5),blurRadius: 5, offset: Offset(1, 1) ),
+            ],
+            color: Colors.white,
           ),
           child: Expanded(
             child: Row(
               children: [
                 Expanded(
-                  flex: 1,
-                  child: Container(
-                      child: Image.network(
-                    "https://miro.medium.com/max/1200/1*mk1-6aYaf_Bes1E3Imhc0A.jpeg",
-                    fit: BoxFit.cover,
-                  )),
-                ),
-                Expanded(
                   flex: 2,
                   child: Container(
+                      height: MediaQuery.of(context).size.height / 4.5,
+                      child: Image.asset(
+                        // dataa.get("image")
+                        "assets/images/restaurants-jays-burger.png",
+                        fit: BoxFit.cover,
+                      )),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Container(
+                    margin: EdgeInsets.only(top: 20),
                       child: Column(
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(2.0),
                         child: Text(
                           dataa.get("name"),
-                          style: TextStyle(fontSize: 30),
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
                         ),
                       ),
                       Padding(
@@ -243,8 +255,9 @@ class _MarketViewState extends State<MarketView> {
                       Padding(
                         padding: const EdgeInsets.all(5.0),
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.location_searching),
+                            // Icon(Icons.location_searching),
                             Text(address),
                             // Text(dataa.get("location")),
                           ],

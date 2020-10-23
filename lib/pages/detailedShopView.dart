@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dexv2/pages/myaddress.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -10,6 +11,7 @@ class DetailedEntityView extends StatefulWidget {
   final String ent_des;
   final String ent_name;
   final String ent_img;
+  final String pickup;
 
   DetailedEntityView({
     Key key,
@@ -17,6 +19,7 @@ class DetailedEntityView extends StatefulWidget {
     this.ent_des,
     this.ent_name,
     this.ent_img,
+    this.pickup,
   }) : super(key: key);
   List<Icon> logo = [Icon(Icons.add)];
   @override
@@ -25,6 +28,7 @@ class DetailedEntityView extends StatefulWidget {
 
 class _DetailedEntityViewState extends State<DetailedEntityView> {
   Future getData0;
+  Map cart = {};
   List productIds = [];
   @override
   void initState() {
@@ -88,8 +92,6 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
     QuerySnapshot dataa = data;
     print("data");
     print(dataa.docs.length);
-  
-
     print(data);
     if (data != null) {
       return Container(
@@ -99,7 +101,16 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
               if (productIds.isEmpty) {
                 showMessage("Cart is Empty");
               } else {
-                // Navi\
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (BuildContext context) {
+                  return MyAddress(
+                    resturantStats: {
+                      "pickup": widget.pickup,
+                      "resturant": widget.ent_id
+                    },
+                    originalcart: cart
+                  );
+                }));
               }
             }),
             child: Container(
@@ -131,16 +142,18 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
                 children: <Widget>[
                   Container(
                     width: MediaQuery.of(context).size.width,
-                    height: 100,
-                    child: Image.network(widget.ent_img,
-                        key: widget.key, 
-                        fit: BoxFit.cover,
-                        filterQuality: FilterQuality.low,
-                        ),
+                    height: 150,
+                    // child: Image.network(widget.ent_img,
+                    child: Image.asset(
+                      "assets/images/restaurants-jays-burger.png",
+                      key: widget.key,
+                      fit: BoxFit.cover,
+                      filterQuality: FilterQuality.low,
+                    ),
                   ),
                   Container(
                     width: MediaQuery.of(context).size.width,
-                    height: 100,
+                    height: 150,
                     color: Colors.black12,
                   ),
                   Padding(
@@ -222,7 +235,7 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
                   ],
                 ),
               ),
-                  // print(dataa.docs.first.data());
+              // print(dataa.docs.first.data());
               Expanded(
                 child: GridView.count(
                     crossAxisCount: 2,
@@ -277,7 +290,7 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
 
   // Builder
   Widget _builder(dynamic data, int index) {
-    QueryDocumentSnapshot dataa = data ;
+    QueryDocumentSnapshot dataa = data;
     return GestureDetector(
       onTap: () {},
       child: Padding(
@@ -285,108 +298,127 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
         child: Expanded(
             // margin: EdgeInsets.all(10),
             child: Stack(
-              alignment: Alignment.center,
-              children: <Widget>[
-                Container(
-                  height: 175.0,
-                  width: 175.0,
-                  child: Image.network(
-                     dataa.get("image")[0],
-                    key: widget.key,
-                    fit: BoxFit.cover,
-                    filterQuality: FilterQuality.low,
+          alignment: Alignment.center,
+          children: <Widget>[
+            Container(
+              height: 175.0,
+              width: 175.0,
+              child: Image.network(
+                dataa.get("image")[0],
+                key: widget.key,
+                fit: BoxFit.cover,
+                filterQuality: FilterQuality.low,
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+            ),
+            GestureDetector(
+              onLongPress: () {
+                showDetails(dataa);
+              },
+              child: Container(
+                height: 175.0,
+                width: 175.0,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  gradient: LinearGradient(colors: [
+                    Colors.black.withOpacity(0.3),
+                    Colors.black87.withOpacity(0.3),
+                    Colors.black54.withOpacity(0.3),
+                    Colors.black38.withOpacity(0.3),
+                  ], begin: Alignment.topRight, end: Alignment.bottomLeft),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 60.0,
+              child: Column(
+                children: <Widget>[
+                  Text(
+                    dataa.get("name"),
+                    style: TextStyle(
+                        //resturant name
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 1.2),
                   ),
+                  Text(
+                    dataa.get("price").toString(),
+                    style: TextStyle(
+                        // price
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 1.2),
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+                bottom: 10,
+                right: 10,
+                child: Container(
+                  margin: EdgeInsets.only(right: 10),
+                  width: 48,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),
-                GestureDetector(
-                  onLongPress: () {
-                    showDetails(dataa);
-                  },
-                  child: Container(
-                    height: 175.0,
-                    width: 175.0,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10.0),
-                      gradient: LinearGradient(colors: [
-                        Colors.black.withOpacity(0.3),
-                        Colors.black87.withOpacity(0.3),
-                        Colors.black54.withOpacity(0.3),
-                        Colors.black38.withOpacity(0.3),
-                      ], begin: Alignment.topRight, end: Alignment.bottomLeft),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 60.0,
-                  child: Column(
-                    children: <Widget>[
-                      Text(
-                        dataa.get("name"),
-                        style: TextStyle(
-                            //resturant name
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            letterSpacing: 1.2),
-                      ),
-                      Text(
-                        dataa.get("price").toString(),
-                        style: TextStyle(
-                            // price
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            letterSpacing: 1.2),
-                      ),
-                    ],
-                  ),
-                ),
-                Positioned(
-                    bottom: 10,
-                    right: 10,
-                    child: Container(
-                      margin: EdgeInsets.only(right: 10),
-                      width: 48,
-                      decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
-                          borderRadius: BorderRadius.circular(30)),
-                      child: IconButton(
-                          icon: widget.logo[index],
-                          color: Colors.white,
-                          onPressed: () {
-                            // Provider.of<AppState>(context, listen: false)
-                            //     .cartProducts
-                            //     .add(Product.fromJson(data));
+                      color: Theme.of(context).primaryColor,
+                      borderRadius: BorderRadius.circular(30)),
+                  child: IconButton(
+                      icon: widget.logo[index],
+                      color: Colors.white,
+                      onPressed: () {
+                        // Provider.of<AppState>(context, listen: false)
+                        //     .cartProducts
+                        //     .add(Product.fromJson(data));
 
-                            if (!this.productIds.contains(dataa.id)) {
-                              setState(() {
-                                widget.logo[index] = Icon(Icons.remove);
-                              });
+                        if (!this.productIds.contains(dataa.id)) {
+                          setState(() {
+                            widget.logo[index] = Icon(Icons.remove);
+                          });
 
-                              Future.delayed(Duration(seconds: 1), () {
-                                setState(() {
-                                  this.productIds.add(dataa.id);
-                                  print('added ' + dataa.id);
-                                });
+                          Future.delayed(Duration(seconds: 1), () {
+                            setState(() {
+                              cart.addAll({
+                                "${dataa.get("name").toString()}":{
+                                  "price":dataa.get("price"),
+                                  "image":dataa.get("image")[0],
+                                  "quantity":1,
+                                },
+                              
                               });
-                            } else {
-                              setState(() {
-                                widget.logo[index] = Icon(Icons.add);
-                                print('removed ' + dataa.id);
-                              });
+                              // cart.addEntries({
+                              //   dataa.get("name").toString():
+                              //   {
+                              //     "price": dataa.get("name"),
+                              //     "image":"https://hips.hearstapps.com/hmg-prod/images/delish-190808-baked-drumsticks-0217-landscape-pf-1567089281.jpg",
+                              //     "quantity": 1
+                              //   }
+                              // });
 
-                              Future.delayed(Duration(seconds: 1), () {
-                                setState(() {
-                                  this.productIds.remove(dataa.id);
-                                });
-                              });
-                            }
-                          }),
-                    )),
-              ],
-            )),
+                              this.productIds.add(dataa.id);
+                              print('added ' + cart.length.toString());
+                              print('added ' + dataa.id);
+                            });
+                          });
+                        } else {
+                          setState(() {
+                            widget.logo[index] = Icon(Icons.add);
+                            print('removed ' + dataa.id);
+                          });
+
+                          Future.delayed(Duration(seconds: 1), () {
+                            setState(() {
+                              cart.remove(dataa.get("name").toString());
+                              this.productIds.remove(dataa.id);
+                            });
+                          });
+                        }
+                      }),
+                )),
+          ],
+        )),
       ),
     );
   }
@@ -481,7 +513,8 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
           );
         });
   }
-showMessage(String massage) {
+
+  showMessage(String massage) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -498,12 +531,14 @@ showMessage(String massage) {
             ],
           );
         });
-  }   
-  
-   Future future() {
+  }
+
+  Future future() {
     // print(FirebaseFirestore.instance.collection("products").snapshots().toList());
     print("ds");
     print("markets/${widget.ent_id}/products");
-    return FirebaseFirestore.instance.collection("markets/${widget.ent_id}/products").get();
+    return FirebaseFirestore.instance
+        .collection("markets/${widget.ent_id}/products")
+        .get();
   }
 }

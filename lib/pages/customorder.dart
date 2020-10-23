@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dexv2/base.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -410,6 +411,11 @@ class _CustomOrderState extends State<CustomOrder> {
                   print("level three");
                    showMessage("Everything Cool", "Apperently, everything was cool");
                   print("level four");
+                  Navigator.of(context).push(
+      MaterialPageRoute(builder: (BuildContext context) {
+        return Base( order_placed : true);
+      }),
+    );
                   
                 });
               })

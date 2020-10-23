@@ -31,6 +31,8 @@ dependencies:
   location: ^3.0.0
   intl: ^0.16.1
   flutter_svg: ^0.18.1
+  firebase_storage: ^4.0.1
+  audioplayers: ^0.16.1
 
 
 

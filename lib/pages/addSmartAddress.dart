@@ -88,7 +88,9 @@ class _SmartAddressState extends State<SmartAddress> {
             ] ,
             "type":"smart"
         }).then(
-          (value) => print("value: $value")
+          (value) => {
+            Navigator.of(context).pop()
+          } 
           ).catchError(
             (onError) => {print("error $onError")}
             );

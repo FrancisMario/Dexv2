@@ -1,8 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dexv2/pages/addSmartAddress.dart';
+import 'package:dexv2/pages/checkout.dart';
+import 'package:dexv2/pages/normalAddress.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
 
 class MyAddress extends StatefulWidget {
+  final Map originalcart;
+  final Map resturantStats;
+  const MyAddress({Key key, this.originalcart, this.resturantStats})
+      : super(key: key);
   @override
   _MyAddressState createState() => _MyAddressState();
 }
@@ -15,7 +23,7 @@ class _MyAddressState extends State<MyAddress> {
     () => 'Data Loaded',
   );
 
-  Future _future() async {
+  _future() {
     User user = auth.currentUser;
     // if (await docExist(user.uid)) {
     //   // che
@@ -23,12 +31,14 @@ class _MyAddressState extends State<MyAddress> {
     //   return "Database doesnt exist ${user.uid}";
     // }
 
-    final QuerySnapshot result = await FirebaseFirestore.instance
+    //  Stream<QuerySnapshot> result = FirebaseFirestore.instance
+    //     .collection('users/${user.uid}/address')
+    //     // .where("type", isEqualTo: 'normal')
+    //     .snapshots();
+    // final List<DocumentSnapshot> documents = result.toList();
+    return FirebaseFirestore.instance
         .collection('users/${user.uid}/address')
-        // .where("type", isEqualTo: 'normal')
-        .get();
-    final List<DocumentSnapshot> documents = result.docs;
-    return documents;
+        .snapshots();
   }
 
   // Future<bool> docExist(String uid) async {
@@ -43,154 +53,243 @@ class _MyAddressState extends State<MyAddress> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("My Addresses")),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showGeneralDialog(
-            barrierLabel: "Label",
-            barrierDismissible: true,
-            barrierColor: Colors.black.withOpacity(0.5),
-            transitionDuration: Duration(milliseconds: 700),
-            context: context,
-            pageBuilder: (context, anim1, anim2) {
-              return Align(
-                alignment: Alignment.bottomRight,
-                child: Material(
-                  type: MaterialType.transparency,
-                  child: Container(
-                    height: 200,
-                    width: 100,
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            width: 100,
-                            color: Colors.amberAccent,
-                            child: Center(
-                              child: Column(
-                                children: <Widget>[
-                                  Icon(Icons.directions_walk, size: 30),
-                                  Text("Smart address",
-                                      style: TextStyle(fontSize: 10))
-                                ],
+        appBar: AppBar(title: Text("My Addresses")),
+        floatingActionButton:
+            // widget.originalcart !== null ?
+            FloatingActionButton(
+          onPressed: () {
+            showGeneralDialog(
+              barrierLabel: "Label",
+              barrierDismissible: true,
+              barrierColor: Colors.black.withOpacity(0.5),
+              transitionDuration: Duration(milliseconds: 700),
+              context: context,
+              pageBuilder: (context, anim1, anim2) {
+                return Align(
+                  alignment: Alignment.bottomRight,
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: Container(
+                      height: 200,
+                      width: 100,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) {
+                                    return SmartAddress();
+                                  }),
+                                );
+                              },
+                              child: Container(
+                                width: 100,
+                                color: Colors.white,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      Icon(Icons.directions_walk, size: 30),
+                                      Text("Smart address",
+                                          style: TextStyle(fontSize: 10))
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            width: 100,
-                            color: Colors.amber,
-                            child: Center(
-                              child: Column(
-                                children: <Widget>[
-                                  Icon(Icons.directions_car, size: 30),
-                                  Text(
-                                    "Normal address",
-                                    style: TextStyle(fontSize: 10),
-                                  )
-                                ],
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) {
+                                    return NormalAddress();
+                                  }),
+                                );
+                              },
+                              child: Container(
+                                width: 100,
+                                color: Colors.red,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      Icon(
+                                        Icons.directions_car,
+                                        size: 30,
+                                        color: Colors.white,
+                                      ),
+                                      Text(
+                                        "Normal address",
+                                        style: TextStyle(
+                                            fontSize: 10, color: Colors.white),
+                                      )
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                      margin: EdgeInsets.only(bottom: 50, left: 12, right: 12),
                     ),
-                    margin: EdgeInsets.only(bottom: 50, left: 12, right: 12),
                   ),
-                ),
+                );
+              },
+              transitionBuilder: (context, anim1, anim2, child) {
+                return SlideTransition(
+                  position: Tween(begin: Offset(0, 1), end: Offset(0, 0))
+                      .animate(anim1),
+                  child: child,
+                );
+              },
+            );
+          },
+          child: Container(
+            width: MediaQuery.of(context).size.width / 5,
+            height: MediaQuery.of(context).size.width / 5,
+            decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(
+                    MediaQuery.of(context).size.width / 2.5)),
+            child: Center(child: Icon(Icons.add)),
+          ),
+        )
+        // : Text("")
+        ,
+        body: StreamBuilder<dynamic>(
+          stream: _future(), // a previously-obtained Future<String> or null
+          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+            List<Widget> children;
+            if (snapshot.hasData) {
+              var aa = snapshot.data as QuerySnapshot;
+              var ss = aa.docs;
+              if (ss.length == 0) {
+                //if no addresses were found
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(50.0),
+                    child: Text(
+                        "No Contact Addresses yet. Use the button below to add new addresses"),
+                  ),
+                );
+              }
+              return Container(
+                margin: EdgeInsets.only(bottom: 80),
+                child: ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    // itemExtent: 80.0,
+                    itemCount: ss.length,
+                    itemBuilder: (context, index) {
+                      return Card(ss[index], context);
+                      // return Text(ss[index].get("uid"),style: TextStyle(fontSize:20),);
+                    }),
               );
-            },
-            transitionBuilder: (context, anim1, anim2, child) {
-              return SlideTransition(
-                position: Tween(begin: Offset(0, 1), end: Offset(0, 0))
-                    .animate(anim1),
-                child: child,
-              );
-            },
-          );
-        },
-      ),
-      body: 
-      FutureBuilder<dynamic>(
-        future: _future(), // a previously-obtained Future<String> or null
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          List<Widget> children;
-          if (snapshot.hasData) {
-            var ss = snapshot.data as List<QueryDocumentSnapshot>;
-            if (ss.length == 0) {
-              //if no addresses were found
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(50.0),
-                  child: Text(
-                      "No Contact Addresses yet. Use the button below to add new addresses"),
-                ),
-              );
+              // print(ss.data());
+              //  return Text("Jasasa + ${snapshot.data[0]}");
+            } else if (snapshot.hasError) {
+              return Error(snapshot.error);
+            } else {
+              return Loading();
             }
-            return ListView.builder(
-                // itemExtent: 80.0,
-                itemCount: ss.length,
-                itemBuilder: (context, index) {
-                  return Card(ss[index], context);
-                  // return Text(ss[index].get("uid"),style: TextStyle(fontSize:20),);
-                });
-            // print(ss.data());
-            //  return Text("Jasasa + ${snapshot.data[0]}");
-          } else if (snapshot.hasError) {
-            return Error(snapshot.error);
-          } else {
-            return Loading();
-          }
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: children,
-            ),
-          );
-        },
-      ),
-    
-    );
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: children,
+              ),
+            );
+          },
+        ),
+        bottomSheet: widget.originalcart != null
+            ? Container(
+                // margin: EdgeInsets.only(top: 10),
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.width / 4,
+                color: Colors.red[900],
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: GestureDetector(
+                      onTap: () {
+                        getAddress();
+                      },
+                      child: widget.originalcart != null
+                          ? Container(
+                              height: MediaQuery.of(context).size.width / 4,
+                              color: Colors.red,
+                              child: Center(
+                                child: Text(
+                                  "Use This Location",
+                                  // "Deliver To Current Location",
+                                  style: TextStyle(
+                                      fontSize: 25, color: Colors.white),
+                                ),
+                              ),
+                            )
+                          : Text("oij"),
+                    )),
+                  ],
+                ),
+              )
+            : Text(""));
   }
 
   Loading() {
-    return Column(children: <Widget>[
-      SizedBox(
-        child: CircularProgressIndicator(),
-        width: 60,
-        height: 60,
-      ),
-      const Padding(
-        padding: EdgeInsets.only(top: 16),
-        child: Text('Awaiting result...'),
-      )
-    ]);
+    return Center(
+      child: Column(children: <Widget>[
+        SizedBox(
+          child: CircularProgressIndicator(),
+          width: 60,
+          height: 60,
+        ),
+        const Padding(
+          padding: EdgeInsets.only(top: 16),
+          child: Text('Awaiting result...'),
+        )
+      ]),
+    );
   }
 
   Card(QueryDocumentSnapshot data, BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: Container(
         width: MediaQuery.of(context).size.width / 1.5,
-        height: MediaQuery.of(context).size.height / 5,
+        // height: MediaQuery.of(context).size.height / 5,
         // height: 50,
         decoration: BoxDecoration(
-            color: Colors.blueAccent, borderRadius: BorderRadius.circular(10)),
+            color: Colors.white,
+            // border: Border.all(
+            //   color: Colors.white
+            // ),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.grey, blurRadius: 10, offset: Offset(2, 2)),
+            ],
+            borderRadius: BorderRadius.circular(10)),
         child: Column(
           children: <Widget>[
             Row(
               children: <Widget>[
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                     child: Text(
                       data.get("name"),
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w900,
-                          color: Colors.white),
+                          color: Colors.red),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -276,7 +375,7 @@ class _MyAddressState extends State<MyAddress> {
                                                         fontSize: 15,
                                                         fontWeight:
                                                             FontWeight.w500,
-                                                        color: Colors.black87),
+                                                        color: Colors.black),
                                                   ),
                                                 ),
                                                 Divider(),
@@ -296,7 +395,7 @@ class _MyAddressState extends State<MyAddress> {
                                                         fontSize: 15,
                                                         fontWeight:
                                                             FontWeight.w800,
-                                                        color: Colors.black87),
+                                                        color: Colors.black),
                                                     overflow: TextOverflow.clip,
                                                   ),
                                                 ),
@@ -380,7 +479,7 @@ class _MyAddressState extends State<MyAddress> {
                                         ],
                                       )),
                                       margin: EdgeInsets.only(
-                                          bottom: 50, left: 12, right: 12),
+                                          bottom: 20, left: 12, right: 12),
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(10),
@@ -404,7 +503,7 @@ class _MyAddressState extends State<MyAddress> {
                           child: Icon(
                             Icons.info,
                             size: 35,
-                            color: Colors.white,
+                            color: Colors.grey,
                           ))),
                 )),
               ],
@@ -417,18 +516,52 @@ class _MyAddressState extends State<MyAddress> {
                     child: Text(
                       data.get("description"),
                       style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white),
+                          color: Colors.black38),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
               ],
             ),
+            widget.originalcart != null ? selectButton(data) : Text(""),
           ],
         ),
       ),
+    );
+  }
+
+  Widget selectButton(data) {
+    data.get("description");
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Center(
+            child: GestureDetector(
+              onTap: () {
+                setAddress(data);
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 5.0),
+                color: Colors.green,
+                width: 150,
+                height: 50,
+                child: Center(
+                  child: Text(
+                    "Select",
+                    style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -458,5 +591,136 @@ class _MyAddressState extends State<MyAddress> {
         child: Text('Result: ${data}'),
       )
     ];
+  }
+
+  showMessage(String title, String massage) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Alert"),
+            content: Text(massage),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Close"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
+  }
+
+// sets the delivery address to one of the clients addresses
+  setAddress(QueryDocumentSnapshot data) {
+    var address;
+    User user = auth.currentUser;
+    if (data.get("type") == "normal") {
+      address = {
+        "description": data.get("description"),
+        "location": data.get("location"),
+        "type": data.get("type"),
+      };
+    } else {
+      address = {
+        "description": data.get("description"),
+        "geopoint": data.get("location"),
+        "type": data.get("type"),
+      };
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (BuildContext context) {
+        return Checkout(
+          originalcart: widget.originalcart,
+          resturantStats: widget.resturantStats,
+          client: {
+            "id": user.uid,
+            "address": address,
+          },
+        );
+      }),
+    );
+  }
+
+// sets the delivery address to the clients current location
+  getAddress() async {
+    Location location = new Location();
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+    LocationData _locationData;
+
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        showMessage("Error", "You must enable Location on your phone.");
+        getAddress();
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        showMessage(
+            "Error", "You must grant us permission to access your location");
+        getAddress();
+      }
+    }
+
+    _locationData = await location.getLocation();
+
+    print(_locationData.latitude);
+    print(_locationData.longitude);
+
+    _proceedToCheckout({
+      "latitude": _locationData.latitude,
+      "longitude": _locationData.longitude
+    });
+  }
+
+  _proceedToCheckout(address) async {
+    User user = auth.currentUser;
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (BuildContext context) {
+        return Checkout(
+          originalcart: widget.originalcart,
+          resturantStats: widget.resturantStats,
+          client: {
+            "id": user.uid,
+            "address": address,
+          },
+        );
+      }),
+    );
+    // Checkout(
+    //   originalcart: widget.originalcart,
+    //   resturantStats: widget.resturantStats,
+    //   client: {
+    //     "id": user.uid,
+    //     "address": address,
+    //   },
+    // );
+
+    // User user = auth.currentUser;
+    // print("user id : ${user.uid}");
+    // var result = FirebaseFirestore.instance
+    //     .collection('users/${user.uid}/address')
+    //     .add({
+    //       "content": {
+    //         "cart": widget.originalcart,
+    //         "resturant": widget.originalcart,
+    //         "client": {
+    //           "id": user.uid,
+    //           "location": {
+    //             "": "",
+    //             "": "",
+    //           },
+    //         }
+    //       },
+    //     })
+    //     .then((value) => {Navigator.of(context).pop()})
+    //     .catchError((onError) => {print("error $onError")});
   }
 }

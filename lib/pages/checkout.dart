@@ -1,5 +1,10 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dexv2/base.dart';
+import 'package:dexv2/pages/checkoutAddress.dart';
+import 'package:dexv2/pages/myaddress.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -8,7 +13,9 @@ class Checkout extends StatefulWidget {
   // final List<Map> cart = widget.inputcart;
   final Map originalcart;
   final Map resturantStats;
-  Checkout({Key key, this.originalcart, this.resturantStats}) : super(key: key);
+  final Map client;
+  Checkout({Key key, this.originalcart, this.resturantStats, this.client})
+      : super(key: key);
 
   @override
   _CheckoutState createState() => _CheckoutState();
@@ -16,6 +23,7 @@ class Checkout extends StatefulWidget {
 
 class _CheckoutState extends State<Checkout> {
   // var mutablecart = widget.originalcart;
+  FirebaseAuth auth = FirebaseAuth.instance;
   List<Widget> builder() {
     List<Widget> children = [];
     widget.originalcart.forEach((key, value) {
@@ -49,7 +57,7 @@ class _CheckoutState extends State<Checkout> {
         // margin: EdgeInsets.only(top: 10),
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.width / 4,
-        color: Colors.teal,
+        color: Colors.red[900],
         child: Row(
           children: [
             Expanded(
@@ -117,13 +125,49 @@ class _CheckoutState extends State<Checkout> {
                 )),
             Expanded(
                 flex: 2,
-                child: Container(
-                  height: MediaQuery.of(context).size.width / 4,
-                  color: Colors.red,
-                  child: Center(
-                    child: Text(
-                      "CheckOut",
-                      style: TextStyle(fontSize: 20, color: Colors.white),
+                child: GestureDetector(
+                  onTap: () {
+                    showProgressDialog(context, "Loading");
+                    // placeOrder();
+                    User user = auth.currentUser;
+
+                    FirebaseFirestore.instance
+                        .collection('users/${user.uid}/orders')
+                        .add({
+                          "resturant": widget.resturantStats,
+                          "cart": widget.originalcart,
+                          "address": widget.client
+                        })
+                        .then((value) => {
+                            Navigator.pop(context),
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) {
+                                  return Base(order_placed: true);
+                                }),
+                              )
+                            })
+                        .catchError((onError) => {print("error $onError")});
+
+                    //  resturantStats
+                    // placeOrder();
+                    // Navigator.of(context).push(
+                    //   MaterialPageRoute(builder: (BuildContext context) {
+                    //     return MyAddress(
+                    //       resturantStats: widget.resturantStats,
+                    //       originalcart: widget.originalcart,
+                    //     );
+                    //   }),
+                    // );
+                  },
+                  child: Container(
+                    height: MediaQuery.of(context).size.width / 4,
+                    color: Colors.red,
+                    child: Center(
+                      child: Text(
+                        "CheckOut",
+                        style: TextStyle(fontSize: 20, color: Colors.white),
+                      ),
                     ),
                   ),
                 )),
@@ -133,18 +177,68 @@ class _CheckoutState extends State<Checkout> {
     );
   }
 
-  int dexService(){
+  showProgressDialog(BuildContext context, String title) async {
+    try {
+      await showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (context) {
+            return AlertDialog(
+              content: Flex(
+                direction: Axis.horizontal,
+                children: <Widget>[
+                  CircularProgressIndicator(),
+                  Padding(
+                    padding: EdgeInsets.only(left: 15),
+                  ),
+                  Flexible(
+                      flex: 8,
+                      child: Text(
+                        title,
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      )),
+                ],
+              ),
+            );
+          });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  placeOrder() async {
+    User user = auth.currentUser;
+    print("user id : ${user.uid}");
+    return await FirebaseFirestore.instance
+        .collection('users/${user.uid}/orders')
+        .add({
+          "resturant": widget.resturantStats,
+          "cart": widget.originalcart,
+          "address": widget.client
+        })
+        .then((value) => {
+              // Navigator.of(context).pop(),
+              MaterialPageRoute(builder: (BuildContext context) {
+                return Base(order_placed: true);
+              }),
+            })
+        .catchError((onError) => {print("error $onError")});
+  }
+
+  int dexService() {
     return 100;
   }
-  int orderCost(){
-    int response = 0;
-       widget.originalcart.forEach((key, value) {
-         response += value["price"] * value["quantity"];
-      });
-      return response;
-  }
-  int total(){
 
+  int orderCost() {
+    int response = 0;
+    widget.originalcart.forEach((key, value) {
+      response += value["price"] * value["quantity"];
+    });
+    return response;
+  }
+
+  int total() {
     return dexService() + orderCost();
   }
 
@@ -169,8 +263,8 @@ class _CheckoutState extends State<Checkout> {
         width: MediaQuery.of(context).size.width / 1.1,
         height: MediaQuery.of(context).size.height / 5.2,
         decoration: BoxDecoration(
-          color: Colors.white30,
-          border: Border.all(color: Colors.black38),
+          color: Colors.white,
+          border: Border.all(color: Colors.black12),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.5),
@@ -246,7 +340,7 @@ class _CheckoutState extends State<Checkout> {
                             decrementItemCount(id);
                           },
                           child: Container(
-                            color: Colors.redAccent,
+                            color: Colors.blueGrey[100],
                             child: Icon(Icons.remove,
                                 size: 35, color: Colors.white),
                           ),
@@ -261,7 +355,7 @@ class _CheckoutState extends State<Checkout> {
                           ),
                         ),
                         Container(
-                          color: Colors.greenAccent,
+                          color: Colors.grey[300],
                           child: GestureDetector(
                               onTap: () {
                                 incrementItemCount(id);

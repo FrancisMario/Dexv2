@@ -98,7 +98,7 @@ class _CategoryState extends State<Category> {
               centerTitle: true,
               // title: Text("Title"),
               background: Image.network(
-                "https://miro.medium.com/max/1200/1*mk1-6aYaf_Bes1E3Imhc0A.jpeg" //TODO
+                "https://drive.google.com/file/d/10FZATLo0nBsAeC-A1Vo4HaNr96L1h0hR/view?usp=sharing" //TODO
                 ,
                 fit: BoxFit.cover,
               ),

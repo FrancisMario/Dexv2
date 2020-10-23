@@ -25,7 +25,7 @@ class _TrackOrdersState extends State<TrackOrders> {
 
     final QuerySnapshot result = await FirebaseFirestore.instance
         .collection('users/${user.uid}/orders')
-        .where("status", isEqualTo: 'processing')
+        // .where("status", isEqualTo: 'processing')
         // .where("status", isEqualTo: 'submitted')
         .get();
     final List<DocumentSnapshot> documents = result.docs;
@@ -45,8 +45,7 @@ class _TrackOrdersState extends State<TrackOrders> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("My Orders")),
-      body: 
-      FutureBuilder<dynamic>(
+      body: FutureBuilder<dynamic>(
         future: _future(), // a previously-obtained Future<String> or null
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           List<Widget> children;
@@ -85,7 +84,6 @@ class _TrackOrdersState extends State<TrackOrders> {
           );
         },
       ),
-    
     );
   }
 
@@ -102,8 +100,17 @@ class _TrackOrdersState extends State<TrackOrders> {
       )
     ]);
   }
+  getResturantName(data) async {
+    QuerySnapshot result = await FirebaseFirestore.instance
+        .collection('market/${data.get("resturant")["resturant"]}')
+        .get();
+
+    
+    return await result.docs.first.get("name");
+  }
 
   Card(QueryDocumentSnapshot data, BuildContext context) {
+  var resturantName =  getResturantName(data.get("resturant")["resturant"]).toString();
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -120,7 +127,9 @@ class _TrackOrdersState extends State<TrackOrders> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      data.get("name"),
+                      // getResturantName(data.get("resturant")["resturant"]),
+                      resturantName,
+                      // data.get("resturant")["resturant"],
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w900,
@@ -185,7 +194,8 @@ class _TrackOrdersState extends State<TrackOrders> {
                                                       const EdgeInsets.only(
                                                           left: 15.0, top: 5),
                                                   child: Text(
-                                                    data.get("detailed_delivery_address"),
+                                                    data.get("resturant")[
+                                                        "resturant"],
                                                     style: TextStyle(
                                                       fontSize: 30,
                                                       fontWeight:
@@ -225,7 +235,8 @@ class _TrackOrdersState extends State<TrackOrders> {
                                                       const EdgeInsets.only(
                                                           left: 15.0, top: 5),
                                                   child: Text(
-                                                    data.get("detailed_pickup_address"),
+                                                    data.get("resturant")[
+                                                        "resturant"],
                                                     style: TextStyle(
                                                         fontSize: 15,
                                                         fontWeight:
@@ -349,7 +360,7 @@ class _TrackOrdersState extends State<TrackOrders> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      data.get("pickupLocation"),
+                      data.get("resturant")["resturant"],
                       style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
