@@ -1,12 +1,6 @@
 // import 'package:flutter/cupertino.dart';
 // import 'package:flutter/material.dart';
 
-// class Audio extends StatefulWidget {
-//   Audio({Key key}) : super(key: key);
-
-//   @override
-//   _AudioState createState() => _AudioState();
-// }
 
 // class _AudioState extends State<Audio> {
 //   @override
@@ -15,43 +9,202 @@
 //   }
 // }
 
+import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
+import 'dart:wasm';
 import 'package:flutter/material.dart';
 
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:firebase_core/firebase_core.dart' as firebase_core;
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:path_provider/path_provider.dart';
-
-/**  
+import 'dart:io' as io;
+/**
  * 
 */
 
-class Audio {
+class Audio extends StatefulWidget {
   final String audio_id;
   final String user_id;
-  firebase_storage.FirebaseStorage storage;
-  Audio({this.user_id, this.audio_id}) {
-    storage = firebase_storage.FirebaseStorage.instance;
-  }
+  final bool   upload_action;
+  final bool   direction;
+  Audio({Key key, this.audio_id, this.user_id, this.upload_action, this.direction}) : super(key: key);
 
-Future<void> uploadExample() async {
-  Directory appDocDir = await getApplicationDocumentsDirectory();
-  String filePath = '${appDocDir.absolute}/voice';
+  @override
+  _AudioState createState() => _AudioState();
 }
-  Future<void> downloadFileExample() async {
-  Directory appDocDir = await getApplicationDocumentsDirectory();
-  File downloadToFile = File('${appDocDir.absolute}/download-logo.png');
+// class Audio {
+  class _AudioState extends State<Audio> {
+  
 
-  try {
-    await firebase_storage.FirebaseStorage.instance
+  bool playing = false;
+  bool downloading = false;
+  bool fileIsonDevice = false;
+  bool download_failed = false;
+  bool uploading = false;
+  double download_level = 0.0; // for download progression loader
+  double upload_level = 0.0; // for upload progression loader
+  double  play_level = 0.0; // for play progression loader
+
+  Future<StorageReference> getDownloadURL() async {
+    // final StorageReference storageReference =
+    return await FirebaseStorage()
         .ref()
-        .writeToFile(downloadToFile);
-  } on firebase_core.FirebaseException catch (e) {
-    // e.g, e.code == 'canceled'
+        .child("voice/${widget.audio_id}")
+        .getDownloadURL();
   }
-}
 
-Widget build(BuildContext context , bool direction){
+  checkFileExists() async {
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    if (await io.File('${appDocDir.absolute}/voice/${widget.audio_id}').exists()) {
+      return true;
+    }
+    return false;
+  }
+
+  @override
+  initState(){
+    if (widget.upload_action) {
+      this.fileIsonDevice = true;
+      uploadFile();
+    }
+
+  }
+
+
+
+  Future<bool> uploadFile() async {
+    uploadingState(state: true);
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    File file = File('${appDocDir.absolute}/voice/${widget.audio_id}');
+    Uint8List buffer = (await file.readAsBytesSync()).buffer.asUint8List();
+    final StorageReference storageReference =
+        FirebaseStorage().ref().child("voice/${widget.user_id}");
+
+    final StorageUploadTask uploadTask = storageReference.putData(buffer);
+
+    final StreamSubscription<StorageTaskEvent> streamSubscription =
+        uploadTask.events.listen((event) {
+      // You can use this to notify yourself or your user in any kind of way.
+      // For example: you could use the uploadTask.events stream in a StreamBuilder instead
+      // to show your user what the current status is. In that case, you would not need to cancel any
+      // subscription as StreamBuilder handles this automatically.
+
+      // Here, every StorageTaskEvent concerning the upload is printed to the logs.
+      print('EVENT ${event.type}');
+
+      print('EVENT ${event.snapshot.totalByteCount}');
+      print('EVENT ${event.snapshot.bytesTransferred}');
+      this.upload_level =
+          ((event.snapshot.totalByteCount / event.snapshot.bytesTransferred) *
+                  100) /
+              100; // update progress bar
+      // TODO SetSTate
+    });
+  }
+  Future<bool> downloadFile() async {
+    uploadingState(state: true);
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    File file = File('${appDocDir.absolute}/voice/${widget.audio_id}');
+    Uint8List buffer = (await file.readAsBytesSync()).buffer.asUint8List();
+    final StorageReference storageReference =
+        FirebaseStorage().ref().child("voice/${widget.user_id}");
+
+    final StorageUploadTask uploadTask = storageReference.putData(buffer);
+
+    final StreamSubscription<StorageTaskEvent> streamSubscription =
+        uploadTask.events.listen((event) {
+      // You can use this to notify yourself or your user in any kind of way.
+      // For example: you could use the uploadTask.events stream in a StreamBuilder instead
+      // to show your user what the current status is. In that case, you would not need to cancel any
+      // subscription as StreamBuilder handles this automatically.
+
+      // Here, every StorageTaskEvent concerning the upload is printed to the logs.
+      print('EVENT ${event.type}');
+
+      print('EVENT ${event.snapshot.totalByteCount}');
+      print('EVENT ${event.snapshot.bytesTransferred}');
+      this.upload_level =
+          ((event.snapshot.totalByteCount / event.snapshot.bytesTransferred) *
+                  100) /
+              100; // update progress bar
+      // TODO SetSTate
+    });
+  }
+
+  uploadingState({bool state = false}) {
+    if (state) {
+      uploading = true;
+    } else {
+      uploading = false;
+    }
+  }
+
+  playState({bool state = false}) {
+    if (state) {
+      playing = true;
+    } else {
+      playing = false;
+    }
+  }
+
+  download_state({bool state = false}) {
+    if (state) {
+      downloading = true;
+    } else {
+      downloading = false;
+    }
+  }
+  play_state({bool state = false}) {
+    if (state) {
+      playing = true;
+    } else {
+      playing = false;
+    }
+  }
+
+  get file async {
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    File downloadToFile = File('${appDocDir.absolute}/${widget.audio_id}');
+    if (fileIsonDevice) {
+      return downloadToFile;
+    } else {
+      if (await downloadFile()) {}
+    }
+  }
+
+  Widget loader() {
+    switch (this.fileIsonDevice) {
+      case true:
+        return Text("1:00");
+        break;
+      case false:
+        if (uploading) {
+          return CircularProgressIndicator(
+            strokeWidth: 5,
+            backgroundColor: Colors.grey.withOpacity(0.5),
+            valueColor: new AlwaysStoppedAnimation<Color>(
+                download_failed ? Colors.white24 : Colors.redAccent),
+            value: upload_level,
+          );
+        } else if (downloading) {
+          return CircularProgressIndicator(
+            strokeWidth: 5,
+            backgroundColor: Colors.grey.withOpacity(0.5),
+            valueColor: new AlwaysStoppedAnimation<Color>(
+                download_failed ? Colors.white24 : Colors.redAccent),
+            // value: upload_level,
+          );
+        }
+        break;
+      case false: 
+        Text("dd");
+        break;
+      default:
+    }
+  }
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         // Navigator.of(context).push(
@@ -61,10 +214,9 @@ Widget build(BuildContext context , bool direction){
         // );
         // firebase_storage.FirebaseStorage storage =
         //   firebase_storage.FirebaseStorage.instance.re;
-
       },
       child: Align(
-        alignment: direction ? Alignment.topLeft : Alignment.topRight,
+        alignment: widget.direction ? Alignment.topLeft : Alignment.topRight,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Container(
@@ -72,7 +224,7 @@ Widget build(BuildContext context , bool direction){
               // height: MediaQuery.of(context).size.height / 6.5,
               height: 75,
               decoration: BoxDecoration(
-                color: direction ? Colors.white : Colors.red,
+                color: widget.direction ? Colors.white : Colors.red,
                 borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
@@ -84,15 +236,7 @@ Widget build(BuildContext context , bool direction){
                   Expanded(
                     flex: 1,
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: CircularProgressIndicator(
-                        strokeWidth: 5,
-                        backgroundColor: Colors.grey.withOpacity(0.5),
-                        valueColor:
-                            new AlwaysStoppedAnimation<Color>(Colors.white24),
-                        value: 0.4,
-                      ),
-                    ),
+                        padding: const EdgeInsets.all(8.0), child: loader()),
                   ),
                   Expanded(
                     flex: 2,
@@ -102,7 +246,7 @@ Widget build(BuildContext context , bool direction){
                         backgroundColor: Colors.grey,
                         valueColor:
                             new AlwaysStoppedAnimation<Color>(Colors.redAccent),
-                        value: 0.3,
+                        value: play_level,
                       ),
                     ),
                   ),
@@ -113,7 +257,7 @@ Widget build(BuildContext context , bool direction){
                         child: Icon(
                           Icons.play_circle_filled,
                           size: 40,
-                          color: direction ? Colors.red : Colors.white,
+                          color: widget.direction ? Colors.red : Colors.white,
                         )),
                   ),
                 ],

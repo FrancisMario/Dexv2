@@ -110,7 +110,7 @@ class _TrackOrdersState extends State<TrackOrders> {
   }
 
   Card(QueryDocumentSnapshot data, BuildContext context) {
-  var resturantName =  getResturantName(data.get("resturant")["resturant"]).toString();
+  var resturantName =  getResturantName(data.get("resturant")).toString();
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(

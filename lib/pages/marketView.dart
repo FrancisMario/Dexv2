@@ -220,9 +220,11 @@ class _MarketViewState extends State<MarketView> {
                   flex: 2,
                   child: Container(
                       height: MediaQuery.of(context).size.height / 4.5,
-                      child: Image.asset(
+                      // child: Image.asset(
+                      child: Image.network(
                         // dataa.get("image")
-                        "assets/images/restaurants-jays-burger.png",
+                        // "assets/images/resta/urants-jays-burger.png",
+                          dataa.get("image"),
                         fit: BoxFit.cover,
                       )),
                 ),

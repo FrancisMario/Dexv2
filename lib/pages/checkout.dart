@@ -139,13 +139,20 @@ class _CheckoutState extends State<Checkout> {
                           "address": widget.client
                         })
                         .then((value) => {
-                            Navigator.pop(context),
-                              Navigator.of(context).push(
+                              Navigator.pop(context),
+                              Navigator.pushAndRemoveUntil(
+                                context,
                                 MaterialPageRoute(
-                                    builder: (BuildContext context) {
-                                  return Base(order_placed: true);
-                                }),
-                              )
+                                    builder: (context) =>
+                                        Base(order_placed: true)),
+                                (Route<dynamic> route) => false,
+                              ),
+                              // Navigator.of(context).push(
+                              //   MaterialPageRoute(
+                              //       builder: (BuildContext context) {
+                              //     return Base(order_placed: true);
+                              //   }),
+                              // )
                             })
                         .catchError((onError) => {print("error $onError")});
 
@@ -219,10 +226,11 @@ class _CheckoutState extends State<Checkout> {
         })
         .then((value) => {
               // Navigator.of(context).pop(),
-              MaterialPageRoute(builder: (BuildContext context) {
-                return Base(order_placed: true);
-              }),
-            })
+               Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => Base(order_placed: true)),
+            (Route<dynamic> route) => false,
+          ) })
         .catchError((onError) => {print("error $onError")});
   }
 

@@ -143,9 +143,10 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
                   Container(
                     width: MediaQuery.of(context).size.width,
                     height: 150,
-                    // child: Image.network(widget.ent_img,
-                    child: Image.asset(
-                      "assets/images/restaurants-jays-burger.png",
+                    child: Image.network(
+                      widget.ent_img,
+                    // child: Image.asset(
+                      // "assets/images/restaurants-jays-burger.png",
                       key: widget.key,
                       fit: BoxFit.cover,
                       filterQuality: FilterQuality.low,
