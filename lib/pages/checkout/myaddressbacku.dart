@@ -22,14 +22,17 @@ class _MyAddressState extends State<MyAddress> {
   FirebaseAuth auth = FirebaseAuth.instance;
   var _pickupLocation = null;
   var _price = 0;
-  var _loading = false;
   List<dynamic> _places = [];
   Future<String> _calculation = Future<String>.delayed(
     Duration(seconds: 2),
     () => 'Data Loaded',
   );
 
- 
+  @override
+  void initState() {
+    super.initState();
+  }
+
   _future() {
     User user = auth.currentUser;
     return FirebaseFirestore.instance
@@ -38,6 +41,7 @@ class _MyAddressState extends State<MyAddress> {
   }
 
   Widget build(BuildContext context) {
+    fetchPlaces();
     return Scaffold(
         appBar: AppBar(title: Text("My Addresses")),
         floatingActionButton:
@@ -88,7 +92,41 @@ class _MyAddressState extends State<MyAddress> {
                               ),
                             ),
                           ),
-                 
+                          // Expanded(
+                          //   child: GestureDetector(
+                          //     onTap: () {
+                          //       Navigator.of(context).push(
+                          //         MaterialPageRoute(
+                          //             builder: (BuildContext context) {
+                          //           return NormalAddress();
+                          //         }),
+                          //       );
+                          //     },
+                          //     child: Container(
+                          //       width: 100,
+                          //       color: Colors.red,
+                          //       child: Center(
+                          //         child: Column(
+                          //           mainAxisAlignment: MainAxisAlignment.center,
+                          //           crossAxisAlignment:
+                          //               CrossAxisAlignment.center,
+                          //           children: <Widget>[
+                          //             Icon(
+                          //               Icons.directions_car,
+                          //               size: 30,
+                          //               color: Colors.white,
+                          //             ),
+                          //             Text(
+                          //               "Normal address",
+                          //               style: TextStyle(
+                          //                   fontSize: 10, color: Colors.white),
+                          //             )
+                          //           ],
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       ),
                       margin: EdgeInsets.only(bottom: 50, left: 12, right: 12),
@@ -174,13 +212,8 @@ class _MyAddressState extends State<MyAddress> {
                     Expanded(
                         child: GestureDetector(
                       onTap: () {
-                        if(!_loading){
-                          this._loading = true;
-                          fetchPlaces();
-                          }
-                          setState(() {
-                            
-                          });
+                        _selectLocation(context);
+
                         // getAddress();
                       },
                       child: widget.originalcart != null
@@ -188,12 +221,12 @@ class _MyAddressState extends State<MyAddress> {
                               height: MediaQuery.of(context).size.width / 4,
                               color: Colors.red,
                               child: Center(
-                                child: !_loading ? Text(
+                                child: Text(
                                   "Deliver Here",
                                   // "Deliver To Current Location",
                                   style: TextStyle(
                                       fontSize: 25, color: Colors.white),
-                                ) : CircularProgressIndicator(backgroundColor:Colors.white),
+                                ),
                               ),
                             )
                           : Text("oij"),
@@ -214,7 +247,7 @@ class _MyAddressState extends State<MyAddress> {
         ),
         const Padding(
           padding: EdgeInsets.only(top: 16),
-          child: Center(child: Text('Awaiting result...')),
+          child: Text('Awaiting result...'),
         )
       ]),
     );
@@ -643,9 +676,9 @@ class _MyAddressState extends State<MyAddress> {
 
   // for determining price because reverse geocoding from coordinate is not working for now.
   _selectLocation(context) async {
+    await fetchPlaces();
     showDialog(
         context: context,
-        barrierDismissible:false,
         builder: (context) => new AlertDialog(
               title: new Text("Select Current Location"),
               content: new Container(
@@ -700,15 +733,6 @@ class _MyAddressState extends State<MyAddress> {
               ),
               actions: <Widget>[
                 FlatButton(
-                  child: Text('Cancel'),
-                  onPressed: () {
-                    this._loading = false;
-                    setState(() {
-                    });
-                    Navigator.of(context).pop();
-                  },
-                ),
-                FlatButton(
                   child: Text('Enter'),
                   onPressed: () {
                     print("pickup location  :" + _pickupLocation);
@@ -718,36 +742,31 @@ class _MyAddressState extends State<MyAddress> {
                       Navigator.of(context).pop();
                     } else {}
                   },
-                ),
+                )
               ],
             ));
   }
 
   fetchPlaces() {
     print("hello");
-    // making sure the places dont load twice
-    if(this._places.isNotEmpty){
-          _selectLocation(context);
-          return;
-    }
+    // var string = await http.get('http://192.168.100.6:3000/locations/');
+    // var string = await http.get('http://admin.dexgambia.com/locations/');
     var string = http
-        .get('http://admin.dexgambia.com/locations/')
-        .then((value) {
-          this._places = jsonDecode(value.body);
-          _selectLocation(context);
-          });
+        .get('http://192.168.100.6:3000/locations/')
+        .then((value) => {this._places = jsonDecode(value.body)});
     this._places.forEach((element) {
       print(element["name"]);
     });
+    // print(this._places);
+    // List<Map> response = jsonDecode(string.body);
+    // await response.forEach((element) {
+    // this._places = element["name"];
+    //  });
   }
 
   setPrice(String name) {
     // var element = _places.singleWhere((element) => element[name]);
     // this._price = element["price"];
-    var response = this._places.singleWhere((element) => element["name"] == name);
-    this._price = response["price"];
-    print("price :" + response["price"].toString());
-
   }
      // Am ashamed of this code right here
     refresh() {
@@ -755,10 +774,6 @@ class _MyAddressState extends State<MyAddress> {
       _selectLocation(context);
     }
   _proceedToCheckout(address) async {
-    this._loading = false;
-    setState(() {
-      
-    });
     User user = auth.currentUser;
     Navigator.of(context).push(
       MaterialPageRoute(builder: (BuildContext context) {
@@ -776,5 +791,33 @@ class _MyAddressState extends State<MyAddress> {
     );
  
 
+    // Checkout(
+    //   originalcart: widget.originalcart,
+    //   resturantStats: widget.resturantStats,
+    //   client: {
+    //     "id": user.uid,
+    //     "address": address,
+    //   },
+    // );
+
+    // User user = auth.currentUser;
+    // print("user id : ${user.uid}");
+    // var result = FirebaseFirestore.instance
+    //     .collection('users/${user.uid}/address')
+    //     .add({
+    //       "content": {
+    //         "cart": widget.originalcart,
+    //         "resturant": widget.originalcart,
+    //         "client": {
+    //           "id": user.uid,
+    //           "location": {
+    //             "": "",
+    //             "": "",
+    //           },
+    //         }
+    //       },
+    //     })
+    //     .then((value) => {Navigator.of(context).pop()})
+    //     .catchError((onError) => {print("error $onError")});
   }
 }

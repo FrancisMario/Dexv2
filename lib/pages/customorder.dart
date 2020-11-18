@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dexv2/base.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:dexv2/base.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -13,20 +13,19 @@ class CustomOrder extends StatefulWidget {
 }
 
 class _CustomOrderState extends State<CustomOrder> {
-  TextEditingController _detailed_pickup_address_controller =
-      new TextEditingController(); //✅
-  TextEditingController _detailed_delivery_address_controller =
-      new TextEditingController(); //✅
-  TextEditingController _recipient_fullname_controller =
-      new TextEditingController(); //✅
-  TextEditingController _recipient_phone_controller =
-      new TextEditingController(); //✅
+  TextEditingController _detailed_pickup_address_controller = new TextEditingController(); //✅
+  TextEditingController _detailed_delivery_address_controller = new TextEditingController(); //✅
+  TextEditingController _recipient_fullname_controller = new TextEditingController(); //✅
+  TextEditingController _recipient_phone_controller = new TextEditingController(); //✅
+
   String _pickupLocation = null;
   String _deliveryLocation = null;
+  String _package_size = null;
   String _pickupDate = null;
   String _pickupTime = null;
   String _deliveryDate = null;
-  List<String> _places = ["aa", "ddd", "Serekunda"];
+  List<String> _places = ["Mio", "ddd", "Serekunda"];
+  List<String> _sizes = ["file", "Small", "Medium", "Large"];
   var dateFormater = new DateFormat('EEE, M/d/yyyy');
   FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -97,7 +96,9 @@ class _CustomOrderState extends State<CustomOrder> {
                       dropdownColor: Colors.grey,
                       elevation: 10,
                       hint: Text(
-                        "Pickup Location",
+                        _pickupLocation == null
+                            ? "Pickup Location"
+                            : _pickupLocation,
                       ),
                       icon: Icon(Icons.add),
                       iconSize: 38,
@@ -110,6 +111,59 @@ class _CustomOrderState extends State<CustomOrder> {
                       },
                       items:
                           _places.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList()),
+                ),
+              ),
+
+              SizedBox(height: 10),
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Column(children: <Widget>[
+                  Align(
+                    child: Text("Package Size"),
+                    alignment: Alignment.centerLeft,
+                  ),
+                  SizedBox(height: 1),
+                  // Divider()
+                ]),
+              ),
+              Padding(
+                padding: EdgeInsets.all(10),
+                child: Container(
+                  width: 250,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    // color: Colors.blueAccent,
+                    // border: Border(
+                    //   top: BorderSide(width: 2.0, color: Color(0xFFFFDFDFDF)),
+                    //   left: BorderSide(width: 2.0, color: Color(0xFFFFDFDFDF)),
+                    //   right: BorderSide(width: 2.0, color: Color(0xFFFF7F7F7F)),
+                    //   bottom: BorderSide(width: 2.0, color: Color(0xFFFF7F7F7F)),
+                    // ),
+                  ),
+                  child: DropdownButton<String>(
+                      // value: _pickupLocation,
+                      dropdownColor: Colors.grey,
+                      elevation: 10,
+                      hint: Text(
+                        _package_size == null ? "Package Size" : _package_size,
+                      ),
+                      icon: Icon(Icons.add),
+                      iconSize: 38,
+                      underline: SizedBox(),
+                      onChanged: (String newValue) {
+                        setState(() {
+                          _package_size = newValue;
+                        });
+                        print("dropdown value: ");
+                      },
+                      items:
+                          _sizes.map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
@@ -387,41 +441,44 @@ class _CustomOrderState extends State<CustomOrder> {
       var result = await FirebaseFirestore.instance
           .collection('users/${user.uid}/orders')
           .add({
-            "detailed_pickup_address": _detailed_pickup_address_controller.text,
-            "detailed_delivery_address":
-                _detailed_delivery_address_controller.text,
-            "recipient_fullname": _recipient_fullname_controller.text,
-            "recipient_phone": _recipient_phone_controller.text,
-            "pickupLocation": _pickupLocation,
-            "deliveryLocation": _deliveryLocation,
-            "pickupDate": _pickupDate,
-            "pickupTime": _pickupTime,
-            "type": "custom",
-            "status": "submitted"
-          })
-          .then((value){
-                print("level two");
-                FirebaseFirestore.instance.collection('custom_orders/').add({
-                  "pickup_date": _pickupDate,
-                  "pickup_time": _pickupTime,
-                  "pickup_location": _pickupLocation,
-                  "user_id": user.uid,
-                  "status": "submitted",
-                }).then((value)  {
-                  print("level three");
-                   showMessage("Everything Cool", "Apperently, everything was cool");
-                  print("level four");
-                  Navigator.of(context).push(
-      MaterialPageRoute(builder: (BuildContext context) {
-        return Base( order_placed : true);
-      }),
-    );
-                  
-                });
-              })
-          .catchError((onError) => {print("error $onError")});
+        "detailed_pickup_address": _detailed_pickup_address_controller.text,
+        "detailed_delivery_address": _detailed_delivery_address_controller.text,
+        "recipient_fullname": _recipient_fullname_controller.text,
+        "recipient_phone": _recipient_phone_controller.text,
+        "pickupLocation": _pickupLocation,
+        "deliveryLocation": _deliveryLocation,
+        "pickupDate": _pickupDate,
+        "pickupTime": _pickupTime,
+        "user_name": user.displayName,
+        "user_phone": user.phoneNumber,
+        "package_size": _package_size,
+        "dexman": "none",
+        "seen": false,
+        "type": "custom",
+        "status": "submitted"
+      }).then((value) {
+        print("level two");
+        FirebaseFirestore.instance.collection('orders/').add({
+          "pickup_date": _pickupDate,
+          "pickup_time": _pickupTime,
+          "pickup_location": _pickupLocation,
+          "package_size": _package_size,
+          "user_id": user.uid,
+          "order_id": value,
+          "type": "custom",
+          "status": "submitted",
+        }).then((value) {
+          showMessage("Success",
+              "order was successfully placed, an agent will contact you soon.");
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => Base(order_placed: true)),
+            (Route<dynamic> route) => false,
+          );
+        });
+      }).catchError((onError) => {print("error $onError")});
     } else {
-      showMessage("Nope..!", "Apperently, everything was NOT cool");
+      showMessage("Error", "Please try again");
     }
   }
 

@@ -105,6 +105,7 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
                     .push(MaterialPageRoute(builder: (BuildContext context) {
                   return MyAddress(
                     resturantStats: {
+                      "name": widget.ent_name,
                       "pickup": widget.pickup,
                       "resturant": widget.ent_id
                     },
@@ -144,7 +145,7 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
                     width: MediaQuery.of(context).size.width,
                     height: 150,
                     child: Image.network(
-                      widget.ent_img,
+                      "http://admin.dexgambia.com/shops/img?img="+widget.ent_img,
                     // child: Image.asset(
                       // "assets/images/restaurants-jays-burger.png",
                       key: widget.key,
@@ -245,8 +246,7 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
                       dataa.docs.length,
                       (index) {
                         widget.logo.add(Icon(Icons.add));
-                        print("sssssssssssssssssssssssssssss");
-                        print(dataa.docs[index].get("name"));
+                        print(dataa.docs[index].data());
                         return _builder(dataa.docs[index], index);
                       },
                     )),
@@ -305,7 +305,7 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
               height: 175.0,
               width: 175.0,
               child: Image.network(
-                dataa.get("image")[0],
+                '"http://admin.dexgambia.com/shops/img?img="${dataa.get("product_image")}',
                 key: widget.key,
                 fit: BoxFit.cover,
                 filterQuality: FilterQuality.low,
@@ -337,7 +337,7 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
               child: Column(
                 children: <Widget>[
                   Text(
-                    dataa.get("name"),
+                    dataa.get("product_name"),
                     style: TextStyle(
                         //resturant name
                         fontSize: 30,
@@ -346,7 +346,7 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
                         letterSpacing: 1.2),
                   ),
                   Text(
-                    dataa.get("price").toString(),
+                    dataa.get("product_price").toString(),
                     style: TextStyle(
                         // price
                         fontSize: 20,
@@ -382,9 +382,9 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
                           Future.delayed(Duration(seconds: 1), () {
                             setState(() {
                               cart.addAll({
-                                "${dataa.get("name").toString()}":{
-                                  "price":dataa.get("price"),
-                                  "image":dataa.get("image")[0],
+                                "${dataa.get("product_name").toString()}":{
+                                  "price":dataa.get("product_price"),
+                                  "image":dataa.get("product_image"),
                                   "quantity":1,
                                 },
                               
@@ -411,7 +411,7 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
 
                           Future.delayed(Duration(seconds: 1), () {
                             setState(() {
-                              cart.remove(dataa.get("name").toString());
+                              cart.remove(dataa.get("product_name").toString());
                               this.productIds.remove(dataa.id);
                             });
                           });
@@ -445,7 +445,7 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
                     children: <Widget>[
                       Expanded(
                           child: Text(
-                        data.get("description"),
+                        'data.get("description")',
                         overflow: TextOverflow.clip,
                       )),
                     ],
@@ -540,6 +540,7 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
     print("markets/${widget.ent_id}/products");
     return FirebaseFirestore.instance
         .collection("markets/${widget.ent_id}/products")
+        .where('product_visible', isEqualTo : "on")
         .get();
   }
 }

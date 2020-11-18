@@ -179,16 +179,14 @@ class _MarketViewState extends State<MarketView> {
   Widget anotherBox(data) {
     QueryDocumentSnapshot dataa = data;
     String address = "Senegambia";
-    GeoPoint geolocation = dataa.get("location");
+    // final coordinates =
+    //     new Coordinates(geolocation.latitude, geolocation.longitude);
 
-    final coordinates =
-        new Coordinates(geolocation.latitude, geolocation.longitude);
-
-    Geocoder.local.findAddressesFromCoordinates(coordinates).then((value) {
-      address = value.first.featureName;
-      print(value.first.featureName);
-      setState(() {});
-    });
+    // Geocoder.local.findAddressesFromCoordinates(coordinates).then((value) {
+    //   address = value.first.featureName;
+    //   print(value.first.featureName);
+    //   setState(() {});
+    // });
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: GestureDetector(
@@ -224,7 +222,7 @@ class _MarketViewState extends State<MarketView> {
                       child: Image.network(
                         // dataa.get("image")
                         // "assets/images/resta/urants-jays-burger.png",
-                          dataa.get("image"),
+                          "http://admin.dexgambia.com/shops/img?img="+dataa.get("image"),
                         fit: BoxFit.cover,
                       )),
                 ),
@@ -260,8 +258,8 @@ class _MarketViewState extends State<MarketView> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             // Icon(Icons.location_searching),
-                            Text(address),
-                            // Text(dataa.get("location")),
+                            // Text('address'),
+                            Text(dataa.get("location")),
                           ],
                         ),
                       ),

@@ -1,22 +1,17 @@
-// import 'package:flutter/cupertino.dart';
-// import 'package:flutter/material.dart';
-
-
-// class _AudioState extends State<Audio> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold
-//   }
-// }
+/**
+ * Author: Mario Francis Gomez
+ * Description: Audio class for the voice messaging functionality.
+ * version:0.0.0 
+ */
 
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
-import 'dart:wasm';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_sound/flutter_sound_player.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io' as io;
 /**
@@ -45,13 +40,17 @@ class Audio extends StatefulWidget {
   double download_level = 0.0; // for download progression loader
   double upload_level = 0.0; // for upload progression loader
   double  play_level = 0.0; // for play progression loader
-
+  FlutterSoundPlayer flutterSoundPlayer;
   Future<StorageReference> getDownloadURL() async {
     // final StorageReference storageReference =
     return await FirebaseStorage()
         .ref()
         .child("voice/${widget.audio_id}")
         .getDownloadURL();
+  }
+
+   Future<void> init() async {
+    flutterSoundPlayer = await new FlutterSoundPlayer().initialize();
   }
 
   checkFileExists() async {

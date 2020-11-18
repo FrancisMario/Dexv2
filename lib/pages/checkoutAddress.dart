@@ -256,7 +256,25 @@ getAddress() async {
           },
         }).then(
           (value) => {
+             FirebaseFirestore.instance
+        .collection('orders/')
+        .add({
+          "content":{
+            "cart":widget.data["orriginalcart"],
+            "resturant":widget.data["resturantStats"],
+            "client":{
+              "id":user.uid,
+              "location":{
+                "":"",
+                "":"",
+              },
+            }
+          },
+        }).then(
+          (value) => {
             Navigator.of(context).pop()
+          } 
+          )
           } 
           ).catchError(
             (onError) => {print("error $onError")}

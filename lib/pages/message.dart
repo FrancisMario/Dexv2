@@ -1,8 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+// import 'package:flutter_sound/flutter_sound_recorder.dart';
+// import 'package:path_provider/path_provider.dart';
+
 
 class Message extends StatefulWidget {
   Message({Key key}) : super(key: key);
@@ -12,12 +16,40 @@ class Message extends StatefulWidget {
 }
 
 class _MessageState extends State<Message> {
-
   var fade = false;
   var visible = false;
+  // FlutterSoundRecorder flutterSoundRecorder;
+  
+  // Future<void> init() async {
+  //   flutterSoundRecorder = await new FlutterSoundRecorder().initialize();
+
+  //   await flutterSoundRecorder.setDbPeakLevelUpdate(0.8);
+  //   await flutterSoundRecorder.setDbLevelEnabled(true);
+  // }
+
+    /*
+   *  Gets or creates the record folder
+   */
+  // Future<String> getAudioFilesFolder() async {
+  //   //Get this App Document Directory
+  //   final Directory _appDocDir = await getApplicationDocumentsDirectory();
+
+  //   //App Document Directory + folder name
+  //   final Directory _appDocDirFolder = Directory('${_appDocDir.path}/Audio/');
+
+  //   if (await _appDocDirFolder.exists()) {
+  //     //if folder already exists return path
+  //     return _appDocDirFolder.path;
+  //   } else {
+  //     //if folder not exists create folder and then return its path
+  //     final Directory _appDocDirNewFolder =
+  //         await _appDocDirFolder.create(recursive: true);
+  //     return _appDocDirNewFolder.path;
+  //   }
+  // }
 
 //   Widget glow(){
-     
+
 //   return AnimatedOpacity(
 //   // If the widget is visible, animate to 0.0 (invisible).
 //   // If the widget is hidden, animate to 1.0 (fully visible).
@@ -63,11 +95,7 @@ class _MessageState extends State<Message> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.send,
-                             size: 40,
-                             color : Colors.white
-                             ),
+                          Icon(Icons.send, size: 40, color: Colors.white),
                           Text(
                             "Send",
                             style: TextStyle(fontSize: 15, color: Colors.white),
@@ -86,11 +114,11 @@ class _MessageState extends State<Message> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                           Icon(
+                          Icon(
                             Icons.mic,
-                             size: 40,
-                             color : Colors.red.withOpacity(0.3),                             
-                             ), 
+                            size: 40,
+                            color: Colors.red.withOpacity(0.3),
+                          ),
                           Text(
                             "Record",
                             style: TextStyle(fontSize: 15, color: Colors.white),
@@ -125,7 +153,6 @@ class _MessageState extends State<Message> {
         // );
         // firebase_storage.FirebaseStorage storage =
         //   firebase_storage.FirebaseStorage.instance.re;
-
       },
       child: Align(
         alignment: incoming ? Alignment.topLeft : Alignment.topRight,
@@ -186,5 +213,4 @@ class _MessageState extends State<Message> {
       ),
     );
   }
-
 }

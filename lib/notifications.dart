@@ -37,7 +37,8 @@ class _Base extends State<Notifications> {
           body: TabBarView(
             children: [
                 Notificate(),
-                Message(),
+                Notificate(),
+                // Message(),
               ],
           ),
         ),

@@ -1,3 +1,9 @@
+
+/// Author: Mario Francis Gomez
+/// 
+/// Description: Adds new normal address, to the user's account. 
+
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +19,7 @@ class NormalAddress extends StatefulWidget {
 }
 
 class _NormalAddressState extends State<NormalAddress> {
-  List<String> _places = [];
+  List<Map> _places = [];
   FirebaseAuth auth = FirebaseAuth.instance;
   final _addressDescriptionController = TextEditingController();
   final _addressLocationController = TextEditingController();
@@ -31,7 +37,10 @@ class _NormalAddressState extends State<NormalAddress> {
   getPlaces() async{
     await FirebaseFirestore.instance.collection('places').get().then((value) => {
       value.docs.forEach((doc)=>{
-        _places.add(doc.get("name").toString())
+        _places.add({
+          "name":doc.get("name").toString(),
+          "pick_price":doc.get("name").toString(),
+        })
       })
     });
   }
@@ -64,6 +73,7 @@ class _NormalAddressState extends State<NormalAddress> {
           "name": _addressNameController.value.text,
           "description": _addressDescriptionController.value.text,
           "location": _addressLocationController.value.text,
+          "pickup_price":"",
           "type": "normal"
         })
         .then((value) => (value) => {Navigator.of(context).pop()})
@@ -108,10 +118,10 @@ class _NormalAddressState extends State<NormalAddress> {
                     });
                     print("dropdown value: ");
                   },
-                  items: _places.map<DropdownMenuItem<String>>((String value) {
+                  items: _places.map<DropdownMenuItem<String>>((Map value) {
                     return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
+                      value: value["name"],
+                      child: Text(value["name"]),
                     );
                   }).toList()),
               SizedBox(height: 10),

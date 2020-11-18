@@ -2,11 +2,10 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dexv2/base.dart';
-import 'package:dexv2/pages/checkoutAddress.dart';
-import 'package:dexv2/pages/myaddress.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class Checkout extends StatefulWidget {
   // final inputcart;
@@ -23,6 +22,7 @@ class Checkout extends StatefulWidget {
 
 class _CheckoutState extends State<Checkout> {
   // var mutablecart = widget.originalcart;
+  int dexServiceFee = 0;
   FirebaseAuth auth = FirebaseAuth.instance;
   List<Widget> builder() {
     List<Widget> children = [];
@@ -54,7 +54,7 @@ class _CheckoutState extends State<Checkout> {
             : Center(child: Text("No Orders in cart")),
       ),
       bottomSheet: Container(
-        // margin: EdgeInsets.only(top: 10),
+        margin: EdgeInsets.all(10),
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.width / 4,
         color: Colors.red[900],
@@ -127,45 +127,12 @@ class _CheckoutState extends State<Checkout> {
                 flex: 2,
                 child: GestureDetector(
                   onTap: () {
-                    showProgressDialog(context, "Loading");
-                    // placeOrder();
-                    User user = auth.currentUser;
-
-                    FirebaseFirestore.instance
-                        .collection('users/${user.uid}/orders')
-                        .add({
-                          "resturant": widget.resturantStats,
-                          "cart": widget.originalcart,
-                          "address": widget.client
-                        })
-                        .then((value) => {
-                              Navigator.pop(context),
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        Base(order_placed: true)),
-                                (Route<dynamic> route) => false,
-                              ),
-                              // Navigator.of(context).push(
-                              //   MaterialPageRoute(
-                              //       builder: (BuildContext context) {
-                              //     return Base(order_placed: true);
-                              //   }),
-                              // )
-                            })
-                        .catchError((onError) => {print("error $onError")});
-
-                    //  resturantStats
-                    // placeOrder();
-                    // Navigator.of(context).push(
-                    //   MaterialPageRoute(builder: (BuildContext context) {
-                    //     return MyAddress(
-                    //       resturantStats: widget.resturantStats,
-                    //       originalcart: widget.originalcart,
-                    //     );
-                    //   }),
-                    // );
+                    // making sure the dex service is already Loaded
+                    // if (dexServiceFee == 0) {
+                    //   showMessage("Error", "Please check your connection and try again");
+                    //   return;
+                    // }
+                    _next();
                   },
                   child: Container(
                     height: MediaQuery.of(context).size.width / 4,
@@ -222,26 +189,45 @@ class _CheckoutState extends State<Checkout> {
         .add({
           "resturant": widget.resturantStats,
           "cart": widget.originalcart,
+          "type": "market",
           "address": widget.client
+        })
+        .then((value) {
+          print("level two");
+          FirebaseFirestore.instance.collection('orders/').add({
+            "user_id": user.uid,
+            "order_id": value,
+            "type": "market",
+            "dexman": "none",
+            "status": "submitted"
+          });
         })
         .then((value) => {
               // Navigator.of(context).pop(),
-               Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => Base(order_placed: true)),
-            (Route<dynamic> route) => false,
-          ) })
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Base(order_placed: true)),
+                (Route<dynamic> route) => false,
+              )
+            })
         .catchError((onError) => {print("error $onError")});
   }
 
-  int dexService() {
-    return 100;
+  dexService() {
+    // var string = http.get('http://admin.dexgambia.com/locations/price');
+    // string.then((value) => {
+    //   int.parse(value.body)
+    //   }).catchError((onError) => {
+    //       // TODO, this is important to the business login of the app, i must log all errors to the server for analysis.
+    //     });
+    return widget.client["price"];
   }
 
   int orderCost() {
     int response = 0;
     widget.originalcart.forEach((key, value) {
-      response += value["price"] * value["quantity"];
+      response += int.parse(value["price"]) * value["quantity"];
     });
     return response;
   }
@@ -265,6 +251,7 @@ class _CheckoutState extends State<Checkout> {
   }
 
   Widget item(id) {
+    print(widget.originalcart[id]);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -289,7 +276,7 @@ class _CheckoutState extends State<Checkout> {
                 child: Container(
                   height: MediaQuery.of(context).size.height / 5.2,
                   child: Image.network(
-                    "${widget.originalcart[id]["image"]}",
+                    "http://admin.dexgambia.com/shops/img?img=${widget.originalcart[id]["image"]}",
                     fit: BoxFit.fill,
                   ),
                 )),
@@ -304,10 +291,13 @@ class _CheckoutState extends State<Checkout> {
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                // Name
+                                // "Name",
                                 "${id}",
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                    fontSize: 25, color: Colors.black87),
+                                  fontSize: 25,
+                                  color: Colors.black87,
+                                ),
                               ),
                             )),
                         Expanded(
@@ -385,5 +375,78 @@ class _CheckoutState extends State<Checkout> {
         ),
       ),
     );
+  }
+
+  _next() {
+    showProgressDialog(context, "Loading");
+    // placeOrder();
+    User user = auth.currentUser;
+
+    FirebaseFirestore.instance.collection('users/${user.uid}/orders').add({
+      "resturant": widget.resturantStats,
+      "cart": widget.originalcart,
+      "user_phone": user.phoneNumber,
+      "dexman": "none",
+      "status": "submitted",
+      "seen": false,
+      "type": "market",
+      "address": widget.client
+    }).then((value) {
+          FirebaseFirestore.instance.collection('orders').add({
+      "resturant": widget.resturantStats,
+      "user_phone": user.phoneNumber,
+      "dexman": "none",
+      "order_id": value.id,
+      "status": "submitted",
+      "seen": false,
+      "type": "market",
+      "address": widget.client
+    }).then((value) {
+      Navigator.pop(context);
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => Base(order_placed: true)),
+        (Route<dynamic> route) => false,
+      );
+    });
+      // Navigator.of(context).push(
+      //   MaterialPageRoute(
+      //       builder: (BuildContext context) {
+      //     return Base(order_placed: true);
+      //   }),
+      // )
+    }).catchError((onError) {
+      showMessage("Error", "Please check your connection and try again");
+    });
+
+    //  resturantStats
+    // placeOrder();
+    // Navigator.of(context).push(
+    //   MaterialPageRoute(builder: (BuildContext context) {
+    //     return MyAddress(
+    //       resturantStats: widget.resturantStats,
+    //       originalcart: widget.originalcart,
+    //     );
+    //   }),
+    // );
+  }
+
+  showMessage(String title, String massage) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(title),
+            content: Text(massage),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Close"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
   }
 }
