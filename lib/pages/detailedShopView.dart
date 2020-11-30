@@ -124,8 +124,8 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
                 children: <Widget>[
                   IconButton(
                       icon: Icon(Icons.shopping_cart),
-                      color: Colors.white,
-                      onPressed: () {}),
+                      color: Colors.white
+                      ),
                   Text(
                     " ${productIds.length.toString()}",
                     style: TextStyle(

@@ -196,6 +196,7 @@ class _MarketViewState extends State<MarketView> {
             return DetailedEntityView(
               ent_des: dataa.get("description"),
               ent_id: dataa.id,
+              pickup: dataa.get("pickup_price"),
               ent_img: dataa.get("image"),
               ent_name: dataa.get("name"),
             );
@@ -203,7 +204,8 @@ class _MarketViewState extends State<MarketView> {
         },
         child: Container(
           width: MediaQuery.of(context).size.width / 1.3,
-          height: MediaQuery.of(context).size.height / 4.5,
+          height: 180,
+          // height: MediaQuery.of(context).size.height / 4.5,
           decoration: BoxDecoration(
             // border: Border.all(color: Colors.black12),
             boxShadow: [
@@ -217,7 +219,7 @@ class _MarketViewState extends State<MarketView> {
                 Expanded(
                   flex: 2,
                   child: Container(
-                      height: MediaQuery.of(context).size.height / 4.5,
+                      // height: MediaQuery.of(context).size.height / 4.5,
                       // child: Image.asset(
                       child: Image.network(
                         // dataa.get("image")

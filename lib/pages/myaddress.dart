@@ -656,21 +656,19 @@ class _MyAddressState extends State<MyAddress> {
                     // height: 60,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
-                      // color: Colors.blueAccent,
-                      // border: Border(
-                      //   top: BorderSide(width: 2.0, color: Color(0xFFFFDFDFDF)),
-                      //   left: BorderSide(width: 2.0, color: Color(0xFFFFDFDFDF)),
-                      //   right: BorderSide(width: 2.0, color: Color(0xFFFF7F7F7F)),
-                      //   bottom: BorderSide(width: 2.0, color: Color(0xFFFF7F7F7F)),
-                      // ),
                     ),
                     child: DropdownButton<String>(
                         // value: _pickupLocation,
-                        dropdownColor: Colors.grey,
+                        style: TextStyle(
+                                fontSize:20,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
+                        dropdownColor: Colors.redAccent,
                         elevation: 10,
                         hint: Text(
                           _pickupLocation == null
-                              ? "Pickup Location"
+                              ? "Delivery Location"
                               : _pickupLocation,
                         ),
                         icon: Icon(Icons.add),
@@ -690,9 +688,10 @@ class _MyAddressState extends State<MyAddress> {
                           // print(value["price"] + "=>" + value["price"]);
                           return DropdownMenuItem<String>(
                             value: value["name"],
-                            child: Text(value["name"],style: TextStyle(
-                              fontSize:15,
-                            )),
+                            child: Expanded(
+                              // color: Colors.white,
+                              child: Text(value["name"],),
+                            ),
                           );
                         }).toList()),
                   ),

@@ -78,7 +78,7 @@ class _CheckoutState extends State<Checkout> {
                                     fontSize: 15, color: Colors.white),
                               ),
                               Text(
-                                "${dexService()}",
+                                "${dexService().toString()}",
                                 style: TextStyle(
                                     fontSize: 15,
                                     color: Colors.white,
@@ -181,48 +181,45 @@ class _CheckoutState extends State<Checkout> {
     }
   }
 
-  placeOrder() async {
-    User user = auth.currentUser;
-    print("user id : ${user.uid}");
-    return await FirebaseFirestore.instance
-        .collection('users/${user.uid}/orders')
-        .add({
-          "resturant": widget.resturantStats,
-          "cart": widget.originalcart,
-          "type": "market",
-          "address": widget.client
-        })
-        .then((value) {
-          print("level two");
-          FirebaseFirestore.instance.collection('orders/').add({
-            "user_id": user.uid,
-            "order_id": value,
-            "type": "market",
-            "dexman": "none",
-            "status": "submitted"
-          });
-        })
-        .then((value) => {
-              // Navigator.of(context).pop(),
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => Base(order_placed: true)),
-                (Route<dynamic> route) => false,
-              )
-            })
-        .catchError((onError) => {print("error $onError")});
-  }
+  // placeOrder() async {
+  //   User user = auth.currentUser;
+  //   int order_cost = orderCost();
+  //   print("user id : ${user.uid}");
+  //   return await FirebaseFirestore.instance
+  //       .collection('users/${user.uid}/orders')
+  //       .add({
+  //         "resturant": widget.resturantStats,
+  //         "cart": widget.originalcart,
+  //         "type": "market",
+  //         "order_cost": order_cost,
+  //         "address": widget.client
+  //       })
+  //       .then((value) {
+  //         print("level two");
+  //         FirebaseFirestore.instance.collection('orders/').add({
+  //           "user_id": user.uid,
+  //           "order_id": value,
+  //           "type": "market",
+  //           "dexman": "none",
+           
+  //           "status": "submitted"
+  //         });
+  //       })
+  //       .then((value) => {
+  //             // Navigator.of(context).pop(),
+  //             Navigator.pushAndRemoveUntil(
+  //               context,
+  //               MaterialPageRoute(
+  //                   builder: (context) => Base(order_placed: true)),
+  //               (Route<dynamic> route) => false,
+  //             )
+  //           })
+  //       .catchError((onError) => {print("error $onError")});
+  // }
 
   dexService() {
-    // var string = http.get('http://admin.dexgambia.com/locations/price');
-    // string.then((value) => {
-    //   int.parse(value.body)
-    //   }).catchError((onError) => {
-    //       // TODO, this is important to the business login of the app, i must log all errors to the server for analysis.
-    //     });
-    return widget.client["price"];
-  }
+    return widget.client["price"] + int.parse(widget.resturantStats["pickup"]) ;
+     }
 
   int orderCost() {
     int response = 0;
@@ -390,25 +387,37 @@ class _CheckoutState extends State<Checkout> {
       "status": "submitted",
       "seen": false,
       "type": "market",
-      "address": widget.client
+      "address": widget.client,
+      "user_name": user.displayName,
+      "order_cost": orderCost(),
+        "dex_service": dexService(),
+        "total": total(),
+      "count":FieldValue.increment(1),
+      "addedOn": FieldValue.serverTimestamp(),
     }).then((value) {
-          FirebaseFirestore.instance.collection('orders').add({
-      "resturant": widget.resturantStats,
-      "user_phone": user.phoneNumber,
-      "dexman": "none",
-      "order_id": value.id,
-      "status": "submitted",
-      "seen": false,
-      "type": "market",
-      "address": widget.client
-    }).then((value) {
-      Navigator.pop(context);
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => Base(order_placed: true)),
-        (Route<dynamic> route) => false,
-      );
-    });
+      FirebaseFirestore.instance.collection('orders')
+      .add({
+        "resturant": widget.resturantStats,
+        "user_phone": user.phoneNumber,
+        "dexman": "none",
+        "order_id_in": value.id,
+        "status": "submitted",
+        "seen": false,
+        "type": "market",
+        "address": widget.client,
+        "order_cost": orderCost(),
+        "dex_service": dexService(),
+        "total": total(),
+        "count":FieldValue.increment(1),
+        "addedOn": FieldValue.serverTimestamp(),
+      }).then((value) {
+        Navigator.pop(context);
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => Base(order_placed: true)),
+          (Route<dynamic> route) => false,
+        );
+      });
       // Navigator.of(context).push(
       //   MaterialPageRoute(
       //       builder: (BuildContext context) {
