@@ -124,8 +124,8 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
                 children: <Widget>[
                   IconButton(
                       icon: Icon(Icons.shopping_cart),
-                      color: Colors.white,
-                      onPressed: () {}),
+                      color: Colors.white
+                      ),
                   Text(
                     " ${productIds.length.toString()}",
                     style: TextStyle(
@@ -142,7 +142,8 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
               Stack(
                 children: <Widget>[
                   Container(
-                    width: MediaQuery.of(context).size.width,
+                    // width: MediaQuery.of(context).size.width,
+                    width: 150,
                     height: 150,
                     child: Image.network(
                       "http://admin.dexgambia.com/shops/img?img="+widget.ent_img,
@@ -305,7 +306,7 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
               height: 175.0,
               width: 175.0,
               child: Image.network(
-                '"http://admin.dexgambia.com/shops/img?img="${dataa.get("product_image")}',
+                'http://admin.dexgambia.com/products/img?img=${dataa.get("product_image")}',
                 key: widget.key,
                 fit: BoxFit.cover,
                 filterQuality: FilterQuality.low,
@@ -338,12 +339,12 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
                 children: <Widget>[
                   Text(
                     dataa.get("product_name"),
+                    overflow: TextOverflow.clip,
                     style: TextStyle(
-                        //resturant name
-                        fontSize: 30,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
-                        letterSpacing: 1.2),
+                        letterSpacing: 1),
                   ),
                   Text(
                     dataa.get("product_price").toString(),
