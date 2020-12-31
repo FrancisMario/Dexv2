@@ -40,83 +40,83 @@ class _MyAddressState extends State<MyAddress> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text("My Addresses")),
-        floatingActionButton:
-            // widget.originalcart !== null ?
-            FloatingActionButton(
-          onPressed: () {
-            showGeneralDialog(
-              barrierLabel: "Label",
-              barrierDismissible: true,
-              barrierColor: Colors.black.withOpacity(0.5),
-              transitionDuration: Duration(milliseconds: 700),
-              context: context,
-              pageBuilder: (context, anim1, anim2) {
-                return Align(
-                  alignment: Alignment.bottomRight,
-                  child: Material(
-                    type: MaterialType.transparency,
-                    child: Container(
-                      height: 200,
-                      width: 100,
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (BuildContext context) {
-                                    return SmartAddress();
-                                  }),
-                                );
-                              },
-                              child: Container(
-                                width: 100,
-                                color: Colors.white,
-                                child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      Icon(Icons.directions_walk, size: 30),
-                                      Text("Smart address",
-                                          style: TextStyle(fontSize: 10))
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
+        // floatingActionButton:
+        //     // widget.originalcart !== null ?
+        //     FloatingActionButton(
+        //   onPressed: () {
+        //     showGeneralDialog(
+        //       barrierLabel: "Label",
+        //       barrierDismissible: true,
+        //       barrierColor: Colors.black.withOpacity(0.5),
+        //       transitionDuration: Duration(milliseconds: 700),
+        //       context: context,
+        //       pageBuilder: (context, anim1, anim2) {
+        //         return Align(
+        //           alignment: Alignment.bottomRight,
+        //           child: Material(
+        //             type: MaterialType.transparency,
+        //             child: Container(
+        //               height: 200,
+        //               width: 100,
+        //               child: Column(
+        //                 children: [
+        //                   Expanded(
+        //                     child: GestureDetector(
+        //                       onTap: () {
+        //                         Navigator.of(context).push(
+        //                           MaterialPageRoute(
+        //                               builder: (BuildContext context) {
+        //                             return SmartAddress();
+        //                           }),
+        //                         );
+        //                       },
+        //                       child: Container(
+        //                         width: 100,
+        //                         color: Colors.white,
+        //                         child: Center(
+        //                           child: Column(
+        //                             mainAxisAlignment: MainAxisAlignment.center,
+        //                             crossAxisAlignment:
+        //                                 CrossAxisAlignment.center,
+        //                             children: <Widget>[
+        //                               Icon(Icons.directions_walk, size: 30),
+        //                               Text("Smart address",
+        //                                   style: TextStyle(fontSize: 10))
+        //                             ],
+        //                           ),
+        //                         ),
+        //                       ),
+        //                     ),
+        //                   ),
                  
-                        ],
-                      ),
-                      margin: EdgeInsets.only(bottom: 50, left: 12, right: 12),
-                    ),
-                  ),
-                );
-              },
-              transitionBuilder: (context, anim1, anim2, child) {
-                return SlideTransition(
-                  position: Tween(begin: Offset(0, 1), end: Offset(0, 0))
-                      .animate(anim1),
-                  child: child,
-                );
-              },
-            );
-          },
-          child: Container(
-            width: MediaQuery.of(context).size.width / 5,
-            height: MediaQuery.of(context).size.width / 5,
-            decoration: BoxDecoration(
-                color: Colors.red,
-                borderRadius: BorderRadius.circular(
-                    MediaQuery.of(context).size.width / 2.5)),
-            child: Center(child: Icon(Icons.add)),
-          ),
-        )
+        //                 ],
+        //               ),
+        //               margin: EdgeInsets.only(bottom: 50, left: 12, right: 12),
+        //             ),
+        //           ),
+        //         );
+        //       },
+        //       transitionBuilder: (context, anim1, anim2, child) {
+        //         return SlideTransition(
+        //           position: Tween(begin: Offset(0, 1), end: Offset(0, 0))
+        //               .animate(anim1),
+        //           child: child,
+        //         );
+        //       },
+        //     );
+        //   },
+        //   child: Container(
+        //     width: MediaQuery.of(context).size.width / 5,
+        //     height: MediaQuery.of(context).size.width / 5,
+        //     decoration: BoxDecoration(
+        //         color: Colors.red,
+        //         borderRadius: BorderRadius.circular(
+        //             MediaQuery.of(context).size.width / 2.5)),
+        //     child: Center(child: Icon(Icons.add)),
+        //   ),
+        // )
         // : Text("")
-        ,
+        // ,
         body: StreamBuilder<dynamic>(
           stream: _future(), // a previously-obtained Future<String> or null
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
@@ -656,21 +656,19 @@ class _MyAddressState extends State<MyAddress> {
                     // height: 60,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
-                      // color: Colors.blueAccent,
-                      // border: Border(
-                      //   top: BorderSide(width: 2.0, color: Color(0xFFFFDFDFDF)),
-                      //   left: BorderSide(width: 2.0, color: Color(0xFFFFDFDFDF)),
-                      //   right: BorderSide(width: 2.0, color: Color(0xFFFF7F7F7F)),
-                      //   bottom: BorderSide(width: 2.0, color: Color(0xFFFF7F7F7F)),
-                      // ),
                     ),
                     child: DropdownButton<String>(
                         // value: _pickupLocation,
-                        dropdownColor: Colors.grey,
+                        style: TextStyle(
+                                fontSize:20,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
+                        dropdownColor: Colors.redAccent,
                         elevation: 10,
                         hint: Text(
                           _pickupLocation == null
-                              ? "Pickup Location"
+                              ? "Delivery Location"
                               : _pickupLocation,
                         ),
                         icon: Icon(Icons.add),
@@ -690,9 +688,10 @@ class _MyAddressState extends State<MyAddress> {
                           // print(value["price"] + "=>" + value["price"]);
                           return DropdownMenuItem<String>(
                             value: value["name"],
-                            child: Text(value["name"],style: TextStyle(
-                              fontSize:15,
-                            )),
+                            child: Expanded(
+                              // color: Colors.white,
+                              child: Text(value["name"],),
+                            ),
                           );
                         }).toList()),
                   ),

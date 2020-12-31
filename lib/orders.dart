@@ -7,7 +7,7 @@ import 'package:flutter/cupertino.dart';
 class Orders extends StatefulWidget {
   final bool order_placed;
 
-  Orders({Key key, this.order_placed}) : super(key: key);
+  Orders({Key key, this.order_placed = false}) : super(key: key);
 
   @override
   _OrdersState createState() => _OrdersState();
@@ -16,12 +16,20 @@ class Orders extends StatefulWidget {
 class _OrdersState extends State<Orders> {
   FirebaseAuth auth = FirebaseAuth.instance;
 
-  
+  // A temporary solution to the redirect the user
+  void checkOrderState() {
+    if (widget.order_placed) {
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (BuildContext context) {
+        return TrackOrders();
+      }));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     User user = auth.currentUser;
-     
+
     return Scaffold(
       body: CustomScrollView(
         physics: BouncingScrollPhysics(),
@@ -45,15 +53,14 @@ class _OrdersState extends State<Orders> {
         ],
       ),
     );
-
-  
   }
 
   List _buildList(int count) {
     List<Widget> listItems = List();
 
     listItems.add(
-      box("DEx Delivery", "Make delivery Orders \nPickups and Drop off's", CustomOrder()),
+      box("DEx Delivery", "Make delivery Orders \nPickups and Drop off's",
+          CustomOrder()),
     );
     listItems.add(
       box("Track Orders", "Track your ongoing orders", TrackOrders()),
@@ -75,16 +82,16 @@ class _OrdersState extends State<Orders> {
         child: new Container(
           decoration: BoxDecoration(
               color: Colors.white,
-        //       gradient: LinearGradient(
-        //   begin: Alignment.topLeft,
-        //   end:
-        //       Alignment(0.8, 0.0), // 10% of the width, so there are ten blinds.
-        //   colors: [
-        //     const Color(0xffef709b),
-        //     const Color(0xfffa9372)
-        //   ], // red to yellow
-        //   // tileMode: TileMode.repeated, // repeats the gradient over the canvas
-        // ),
+              //       gradient: LinearGradient(
+              //   begin: Alignment.topLeft,
+              //   end:
+              //       Alignment(0.8, 0.0), // 10% of the width, so there are ten blinds.
+              //   colors: [
+              //     const Color(0xffef709b),
+              //     const Color(0xfffa9372)
+              //   ], // red to yellow
+              //   // tileMode: TileMode.repeated, // repeats the gradient over the canvas
+              // ),
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
@@ -96,8 +103,7 @@ class _OrdersState extends State<Orders> {
               ]),
           width: MediaQuery.of(context).size.width / 1.2,
           height: MediaQuery.of(context).size.height / 4,
-          child: Column(
-            children: <Widget>[
+          child: Column(children: <Widget>[
             Padding(
               padding: EdgeInsets.only(top: 10, right: 10, left: 10, bottom: 5),
               child: Text(
@@ -126,10 +132,10 @@ class _OrdersState extends State<Orders> {
         ),
       ),
     );
-
   }
-     showMessage(String massage) {
-        showDialog(
+
+  showMessage(String massage) {
+    showDialog(
         context: context,
         barrierDismissible: true,
         builder: (BuildContext context) {

@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
+
 
 class TrackOrders extends StatefulWidget {
   @override
@@ -15,38 +17,41 @@ class _TrackOrdersState extends State<TrackOrders> {
     Duration(seconds: 2),
     () => 'Data Loaded',
   );
-     Future<void> _makePhoneCall(String url) async {
-      if (await canLaunch(url)) {
-        await launch(url);
-      } else {
-        print("call error ");
-      }
+  Future<void> _makePhoneCall(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      print("call error ");
     }
-        confirmCall() {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Alert"),
-              content: Text("Do you want to call DEX support"),
-              actions: <Widget>[
-                FlatButton(
-                  child: Text("Close"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                FlatButton(
-                  child: Text("OK"),
-                  onPressed: () {
-                    _makePhoneCall('tel:+2203188982');
-                    Navigator.of(context).pop();
-                  },
-                )
-              ],
-            );
-          });
-    }
+  }
+
+  confirmCall() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Alert"),
+            content: Text(
+                "Do you want to call DEX support, this will include charges from you gsm provider."),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Close"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              FlatButton(
+                child: Text("OK"),
+                onPressed: () {
+                  _makePhoneCall('tel:+2203188982');
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
+  }
+
   Future _future() async {
     User user = auth.currentUser;
     // if (await docExist(user.uid)) {
@@ -57,9 +62,14 @@ class _TrackOrdersState extends State<TrackOrders> {
 
     final QuerySnapshot result = await FirebaseFirestore.instance
         .collection('users/${user.uid}/orders')
-        .where("status", whereIn: ['processing','transit','cancelled','submitted'])
-        .get();
-    final List<DocumentSnapshot> documents = result.docs;
+        // .orderBy('count')
+        .where("status",
+            whereIn: ['processing', 'transit', 'cancelled', 'submitted']).get();
+    // .limit(10)
+    // .get();
+    print(result.size);
+    print(result);
+    final List<dynamic> documents = result.docs;
     return documents;
   }
 
@@ -119,17 +129,22 @@ class _TrackOrdersState extends State<TrackOrders> {
   }
 
   Loading() {
-    return Column(children: <Widget>[
-      SizedBox(
-        child: CircularProgressIndicator(),
-        width: 60,
-        height: 60,
-      ),
-      const Padding(
-        padding: EdgeInsets.only(top: 16),
-        child: Text('Awaiting result...'),
-      )
-    ]);
+    return Center(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+        SizedBox(
+          child: CircularProgressIndicator(),
+          width: 60,
+          height: 60,
+        ),
+        const Padding(
+          padding: EdgeInsets.only(top: 16),
+          child: Text('Awaiting result...'),
+        )
+      ]),
+    );
   }
 
   getResturantName(data) async {
@@ -142,7 +157,7 @@ class _TrackOrdersState extends State<TrackOrders> {
 
   Card(QueryDocumentSnapshot data, BuildContext context) {
     // var resturantName = getResturantName(data.get("resturant")).toString();
-    if(data.get("status") == "cancelled"){
+    if (data.get("status") == "cancelled") {
       return CancelledOrder();
     }
     return Padding(
@@ -151,8 +166,16 @@ class _TrackOrdersState extends State<TrackOrders> {
         width: MediaQuery.of(context).size.width / 1.5,
         height: MediaQuery.of(context).size.height / 5,
         decoration: BoxDecoration(
-          color: data.get("type") == "custom" ? Colors.white : Colors.red,
+          color: data.get("type") == "custom" ? Colors.white60 : Colors.red,
           borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 3,
+              blurRadius: 5,
+              offset: Offset(0, 2), // changes position of shadow
+            ),
+          ],
         ),
         child: Column(
           children: <Widget>[
@@ -162,7 +185,7 @@ class _TrackOrdersState extends State<TrackOrders> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      // getResturantName(data.get("resturant")["resturant"]),
+                      // resurant name
                       data.get("type") == "custom"
                           ? data.get("deliveryLocation")
                           : data.get("resturant")["name"],
@@ -186,7 +209,7 @@ class _TrackOrdersState extends State<TrackOrders> {
                       alignment: Alignment.centerRight,
                       child: GestureDetector(
                           onTap: () {
-                            // dialog(data);
+                            dialog(data);
                           },
                           child: Icon(
                             Icons.info,
@@ -206,7 +229,7 @@ class _TrackOrdersState extends State<TrackOrders> {
                     child: Text(
                       data.get("type") == "custom"
                           ? data.get("deliveryLocation")
-                          : data.get("resturant")["name"],
+                          : data.get("address")["location"],
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
@@ -299,7 +322,8 @@ class _TrackOrdersState extends State<TrackOrders> {
                       padding: const EdgeInsets.all(8.0),
                       child: FlatButton(
                         color: Colors.green,
-                        child: Container(child: Icon(Icons.call,color: Colors.white)),
+                        child: Container(
+                            child: Icon(Icons.call, color: Colors.white)),
                         onPressed: () {
                           confirmCall();
                         },
@@ -341,8 +365,19 @@ class _TrackOrdersState extends State<TrackOrders> {
     ];
   }
 
+  getTotal(data){
+    var total = 0;
+    total += data.get("address")["price"] + data.get("order_cost");
+    print(total);
+    // data.get("cart").forEach((value){
+    // print(total);
+    //   total += value["price"];
+    // });
+    return total;
+  }
+
   dialog(data) {
-    showGeneralDialog(
+    return showGeneralDialog(
       barrierLabel: "Label",
       barrierDismissible: true,
       barrierColor: Colors.black.withOpacity(0.5),
@@ -366,9 +401,8 @@ class _TrackOrdersState extends State<TrackOrders> {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            data.get("type") == "custom"
-                                ? data.get("deliveryLocation")
-                                : data.get("resturant")["resturant"],
+                            //  
+                             DateFormat('EEE, d/MMM, H:m').format(data.get("addedOn").toDate()).toString(),
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
@@ -386,8 +420,8 @@ class _TrackOrdersState extends State<TrackOrders> {
                           padding: const EdgeInsets.only(left: 15.0, top: 5),
                           child: Text(
                             data.get("type") == "custom"
-                                ? data.get("deliveryLocation")
-                                : data.get("resturant")["resturant"],
+                                ? data.get("recipient_fullname")
+                                : data.get("resturant")["name"],
                             style: TextStyle(
                               fontSize: 30,
                               fontWeight: FontWeight.bold,
@@ -406,8 +440,8 @@ class _TrackOrdersState extends State<TrackOrders> {
                           alignment: Alignment.centerLeft,
                           child: Text(
                             data.get("type") == "custom"
-                                ? data.get("deliveryLocation")
-                                : data.get("resturant")["resturant"],
+                                ? "FROM: "+data.get("pickupLocation") + " : D" +data.get("price")["pickup"].toString() 
+                                : "Delivering To: " + data.get("address")["location"],
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
@@ -425,8 +459,9 @@ class _TrackOrdersState extends State<TrackOrders> {
                           padding: const EdgeInsets.only(left: 15.0, top: 5),
                           child: Text(
                             data.get("type") == "custom"
-                                ? data.get("deliveryLocation")
-                                : data.get("resturant")["resturant"],
+                            ? "TO: "+data.get("deliveryLocation") + " : D" +data.get("price")["delivery"].toString()
+                                : "TOTAL COST: " + (int.parse(data.get("resturant")["pickup"]) + data.get("address")["price"] + data.get("order_cost")).toString(),
+                                // : "TOTAL COST: " + getTotal(data).toString(), 
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w800,
@@ -445,7 +480,7 @@ class _TrackOrdersState extends State<TrackOrders> {
                           alignment: Alignment.centerLeft,
                           child: Text(
                             data.get("type") == "custom"
-                                ? data.get("deliveryLocation")
+                                ?"TOTAL:  D" + data.get("price")["total"].toString()
                                 : data.get("resturant")["resturant"],
                             style: TextStyle(
                                 fontSize: 15,
@@ -457,48 +492,49 @@ class _TrackOrdersState extends State<TrackOrders> {
                       ],
                     ),
                   ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Padding(
-                            padding: const EdgeInsets.all(2.0),
-                            child: FlatButton(
-                              onPressed: () {},
-                              child: Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.deepOrange,
-                                      borderRadius: BorderRadius.circular(5)),
-                                  width: 100,
-                                  height: 50,
-                                  child: Center(
-                                      child: Icon(
-                                    Icons.delete,
-                                    color: Colors.white,
-                                  ))),
-                            )),
-                      ),
-                      Expanded(
-                        child: Padding(
-                            padding: const EdgeInsets.all(2.0),
-                            child: FlatButton(
-                              onPressed: () {},
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.deepOrange,
-                                    borderRadius: BorderRadius.circular(5)),
-                                width: 100,
-                                height: 50,
-                                child: Center(
-                                  child: Icon(
-                                    Icons.share,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            )),
-                      ),
-                    ],
-                  ),
+                  // Row(
+                  //   children: <Widget>[
+                  //     // Expanded(
+                  //     //   child: Padding(
+                  //     //       padding: const EdgeInsets.all(2.0),
+                  //     //       child: FlatButton(
+                  //     //         onPressed: () {},
+                  //     //         child: Container(
+                  //     //             decoration: BoxDecoration(
+                  //     //                 color: Colors.deepOrange,
+                  //     //                 borderRadius: BorderRadius.circular(5)),
+                  //     //             width: 100,
+                  //     //             height: 50,
+                  //     //             child: Center(
+                  //     //                 child: Icon(
+                  //     //               Icons.delete,
+                  //     //               color: Colors.white,
+                  //     //             ))),
+                  //     //       )),
+                  //     // ),
+                  //     // Expanded(
+                  //     //   child: Padding(
+                  //     //       padding: const EdgeInsets.all(2.0),
+                  //     //       child: FlatButton(
+                  //     //         onPressed: () {},
+                  //     //         child: Container(
+                  //     //           decoration: BoxDecoration(
+                  //     //               color: Colors.deepOrange,
+                  //     //               borderRadius: BorderRadius.circular(5)),
+                  //     //           width: 100,
+                  //     //           height: 50,
+                  //     //           child: Center(
+                  //     //             child: Icon(
+                  //     //               Icons.share,
+                  //     //               color: Colors.white,
+                  //     //             ),
+                  //     //           ),
+                  //     //         ),
+                  //     //       )),
+                  //     // ),
+                  //   ],
+                  // ),
+                
                 ],
               )),
               margin: EdgeInsets.only(bottom: 50, left: 12, right: 12),

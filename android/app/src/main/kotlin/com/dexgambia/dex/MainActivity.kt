@@ -1,4 +1,4 @@
-package com.example.dexv2
+package com.dexgambia.dex
 
 import io.flutter.embedding.android.FlutterActivity
 

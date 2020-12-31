@@ -16,7 +16,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class Base extends StatefulWidget {
   final bool order_placed;
-  Base({Key key, this.order_placed = null}) : super(key: key);
+  Base({Key key, this.order_placed = false}) : super(key: key);
   @override
   _Base createState() => _Base();
 }
@@ -29,75 +29,77 @@ class _Base extends State<Base> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      body: DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          appBar: AppBar(
-            toolbarHeight: size.height * 0.10,
-            // automaticallyImplyLeading: true,
-            flexibleSpace: TabBar(
-              tabs: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: Tab(
+    return SafeArea(
+      child: Scaffold(
+        body: DefaultTabController(
+          length: 2,
+          child: Scaffold(
+            appBar: AppBar(
+              toolbarHeight: size.height * 0.12,
+              automaticallyImplyLeading: true,
+              flexibleSpace: TabBar(
+                tabs: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20.0),
+                    child: Tab(
+                        icon: SvgPicture.asset(
+                          "assets/icons/food-delivery.svg",
+                          width: size.width * 0.05,
+                          height: size.height * 0.05,
+                          color: Colors.white,
+                        ),
+                        text: "Delivery"),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20.0),
+                    child: Tab(
                       icon: SvgPicture.asset(
-                        "assets/icons/food-delivery.svg",
+                        "assets/icons/burger.svg",
                         width: size.width * 0.05,
                         height: size.height * 0.05,
                         color: Colors.white,
                       ),
-                      text: "Delivery"),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: Tab(
-                    icon: SvgPicture.asset(
-                      "assets/icons/burger.svg",
-                      width: size.width * 0.05,
-                      height: size.height * 0.05,
-                      color: Colors.white,
+                      text: "DEx Eats",
                     ),
-                    text: "DEx Eats",
                   ),
-                ),
-                // Padding(
-                //   padding: const EdgeInsets.only(top: 20.0),
-                //   child: Tab(
-                //     icon: SvgPicture.asset(
-                //       "assets/icons/location.svg",
-                //       width: size.width * 0.05,
-                //       height: size.height * 0.05,
-                //       color: Colors.white,
-                //     ),
-                //     text: "Addresses",
-                //   ),
-                // ),
-                // Padding(
-                //   padding: const EdgeInsets.only(top: 20.0),
-                //   child: Tab(
-                //     icon: SvgPicture.asset(
-                //       "assets/icons/messaging.svg",
-                //       width: size.width * 0.05,
-                //       height: size.height * 0.05,
-                //       color: Colors.white,
-                //     ),
-                //     text: "messaging",
-                //   ),
-                // ),
+                  // Padding(
+                  //   padding: const EdgeInsets.only(top: 20.0),
+                  //   child: Tab(
+                  //     icon: SvgPicture.asset(
+                  //       "assets/icons/location.svg",
+                  //       width: size.width * 0.05,
+                  //       height: size.height * 0.05,
+                  //       color: Colors.white,
+                  //     ),
+                  //     text: "Addresses",
+                  //   ),
+                  // ),
+                  // Padding(
+                  //   padding: const EdgeInsets.only(top: 20.0),
+                  //   child: Tab(
+                  //     icon: SvgPicture.asset(
+                  //       "assets/icons/messaging.svg",
+                  //       width: size.width * 0.05,
+                  //       height: size.height * 0.05,
+                  //       color: Colors.white,
+                  //     ),
+                  //     text: "messaging",
+                  //   ),
+                  // ),
+                ],
+              ),
+            ),
+            body: TabBarView(
+              // controller : controller,
+              physics: ClampingScrollPhysics(),
+              children: [
+                Orders(order_placed: widget.order_placed),
+                MarketView(),
+                // Address(),
+                // Address(),
+                // Message()
               ],
             ),
-          ),
-          body: TabBarView(
-            // controller : controller,
-            physics: ClampingScrollPhysics(),
-            children: [
-              Orders(order_placed:widget.order_placed),
-              MarketView(),
-              // Address(),
-              // Address(),
-              // Message()
-            ],
           ),
         ),
       ),

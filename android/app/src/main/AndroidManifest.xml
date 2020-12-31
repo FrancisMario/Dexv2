@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.dexv2">
+    package="com.dexgambia.dex">
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
          In most cases you can leave this as-is, but you if you want to provide
@@ -12,8 +12,8 @@
   <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="dexv2"
-        android:icon="@mipmap/ic_launcher">
+        android:label="Dex"
+        android:icon="@drawable/launch_background">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
