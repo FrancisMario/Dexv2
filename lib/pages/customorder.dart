@@ -287,13 +287,17 @@ class _CustomOrderState extends State<CustomOrder> {
               ],
             ),
             SizedBox(height: 10),
+            Align(
+              child: Text("Address Description"),
+              alignment: Alignment.centerLeft,
+            ),
+            SizedBox(height: 10),
             new TextFormField(
               maxLines: 7,
               controller: _detailed_pickup_address_controller,
               decoration: new InputDecoration(
                 // labelText: "Describe the Location.",
-                hintText:
-                    "Address Description eg. West-Coast-Region Serekunda Bamboo",
+                hintText: "Address Description eg. Brusubi Around-Table",
                 hintStyle: TextStyle(wordSpacing: 1000, fontSize: 20),
                 fillColor: Color.fromRGBO(62, 62, 62, 1),
                 border: new OutlineInputBorder(
@@ -445,13 +449,18 @@ class _CustomOrderState extends State<CustomOrder> {
             ),
 
             SizedBox(height: 10),
+            Align(
+              child: Text("Package Description"),
+              alignment: Alignment.centerLeft,
+            ),
+            SizedBox(height: 10),
             new TextFormField(
               maxLines: 7,
               controller: _detailed_delivery_address_controller,
               decoration: new InputDecoration(
                 // labelText: "Describe the Location.",
                 hintText:
-                    "Address Description eg. West-Coast-Region Serekunda Bamboo",
+                    "Address Description eg. Kairaba-Avenue Around-Traffic-Light",
                 hintStyle: TextStyle(wordSpacing: 1000, fontSize: 20),
                 fillColor: Color.fromRGBO(62, 62, 62, 1),
                 border: new OutlineInputBorder(

@@ -4,15 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 
-
 class TrackOrders extends StatefulWidget {
+  final bool placed;
+
+  const TrackOrders({Key key, this.placed = false}) : super(key: key);
   @override
   _TrackOrdersState createState() => _TrackOrdersState();
 }
 
 class _TrackOrdersState extends State<TrackOrders> {
   FirebaseAuth auth = FirebaseAuth.instance;
-
+  bool seen = false;
   Future<String> _calculation = Future<String>.delayed(
     Duration(seconds: 2),
     () => 'Data Loaded',
@@ -22,6 +24,34 @@ class _TrackOrdersState extends State<TrackOrders> {
       await launch(url);
     } else {
       print("call error ");
+    }
+  }
+
+  showMessage(String massage) {
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Message"),
+            content: Text(massage),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Close"),
+                onPressed: () {
+                  // Navigator.of(context).pop();
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          );
+        });
+  }
+
+  void checkOrderState() async {
+    if (widget.placed && this.seen == false) {
+      showMessage("Your Order has been succesfully placed");
+      this.seen = true;
     }
   }
 
@@ -53,6 +83,7 @@ class _TrackOrdersState extends State<TrackOrders> {
   }
 
   Future _future() async {
+    checkOrderState();
     User user = auth.currentUser;
     // if (await docExist(user.uid)) {
     //   // che
@@ -131,19 +162,19 @@ class _TrackOrdersState extends State<TrackOrders> {
   Loading() {
     return Center(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-        SizedBox(
-          child: CircularProgressIndicator(),
-          width: 60,
-          height: 60,
-        ),
-        const Padding(
-          padding: EdgeInsets.only(top: 16),
-          child: Text('Awaiting result...'),
-        )
-      ]),
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(
+              child: CircularProgressIndicator(),
+              width: 60,
+              height: 60,
+            ),
+            const Padding(
+              padding: EdgeInsets.only(top: 16),
+              child: Text('Awaiting result...'),
+            )
+          ]),
     );
   }
 
@@ -365,7 +396,7 @@ class _TrackOrdersState extends State<TrackOrders> {
     ];
   }
 
-  getTotal(data){
+  getTotal(data) {
     var total = 0;
     total += data.get("address")["price"] + data.get("order_cost");
     print(total);
@@ -401,8 +432,10 @@ class _TrackOrdersState extends State<TrackOrders> {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            //  
-                             DateFormat('EEE, d/MMM, H:m').format(data.get("addedOn").toDate()).toString(),
+                            //
+                            DateFormat('EEE, d/MMM, H:m')
+                                .format(data.get("addedOn").toDate())
+                                .toString(),
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
@@ -440,8 +473,12 @@ class _TrackOrdersState extends State<TrackOrders> {
                           alignment: Alignment.centerLeft,
                           child: Text(
                             data.get("type") == "custom"
-                                ? "FROM: "+data.get("pickupLocation") + " : D" +data.get("price")["pickup"].toString() 
-                                : "Delivering To: " + data.get("address")["location"],
+                                ? "FROM: " +
+                                    data.get("pickupLocation") +
+                                    " : D" +
+                                    data.get("price")["pickup"].toString()
+                                : "Delivering To: " +
+                                    data.get("address")["location"],
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
@@ -459,9 +496,17 @@ class _TrackOrdersState extends State<TrackOrders> {
                           padding: const EdgeInsets.only(left: 15.0, top: 5),
                           child: Text(
                             data.get("type") == "custom"
-                            ? "TO: "+data.get("deliveryLocation") + " : D" +data.get("price")["delivery"].toString()
-                                : "TOTAL COST: " + (int.parse(data.get("resturant")["pickup"]) + data.get("address")["price"] + data.get("order_cost")).toString(),
-                                // : "TOTAL COST: " + getTotal(data).toString(), 
+                                ? "TO: " +
+                                    data.get("deliveryLocation") +
+                                    " : D" +
+                                    data.get("price")["delivery"].toString()
+                                : "TOTAL COST: " +
+                                    (int.parse(data
+                                                .get("resturant")["pickup"]) +
+                                            data.get("address")["price"] +
+                                            data.get("order_cost"))
+                                        .toString(),
+                            // : "TOTAL COST: " + getTotal(data).toString(),
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w800,
@@ -480,7 +525,8 @@ class _TrackOrdersState extends State<TrackOrders> {
                           alignment: Alignment.centerLeft,
                           child: Text(
                             data.get("type") == "custom"
-                                ?"TOTAL:  D" + data.get("price")["total"].toString()
+                                ? "TOTAL:  D" +
+                                    data.get("price")["total"].toString()
                                 : data.get("resturant")["resturant"],
                             style: TextStyle(
                                 fontSize: 15,
@@ -534,7 +580,6 @@ class _TrackOrdersState extends State<TrackOrders> {
                   //     // ),
                   //   ],
                   // ),
-                
                 ],
               )),
               margin: EdgeInsets.only(bottom: 50, left: 12, right: 12),

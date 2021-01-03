@@ -123,7 +123,8 @@ class _MarketViewState extends State<MarketView> {
           }));
         },
         child: Container(
-          width: MediaQuery.of(context).size.width / 1.3,
+          // width: MediaQuery.of(context).size.width / 1.3,
+          width: 300,
           height: 180,
           decoration: BoxDecoration(
             boxShadow: [

@@ -23,13 +23,18 @@ class _OrdersState extends State<Orders> {
           .push(MaterialPageRoute(builder: (BuildContext context) {
         return TrackOrders();
       }));
+
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (BuildContext context) {
+        return TrackOrders(placed: true);
+      }));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     User user = auth.currentUser;
-
+    checkOrderState();
     return Scaffold(
       body: CustomScrollView(
         physics: BouncingScrollPhysics(),
