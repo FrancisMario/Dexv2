@@ -135,63 +135,61 @@ class _MarketViewState extends State<MarketView> {
             ],
             color: Colors.white,
           ),
-          child: Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                      child: Image.network(
-                    "http://admin.dexgambia.com/shops/img?img=" +
-                        dataa.get("image"),
-                    fit: BoxFit.cover,
-                  )),
-                ),
-                Expanded(
-                  flex: 3,
-                  child: Container(
-                      margin: EdgeInsets.only(top: 20),
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(2.0),
-                            child: Text(
-                              dataa.get("name"),
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Text(
-                              dataa.get("description"),
-                              overflow: TextOverflow.clip,
-                              style: TextStyle(
+          child: Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: Container(
+                    child: Image.network(
+                  "http://admin.dexgambia.com/shops/img?img=" +
+                      dataa.get("image"),
+                  fit: BoxFit.cover,
+                )),
+              ),
+              Expanded(
+                flex: 3,
+                child: Container(
+                    margin: EdgeInsets.only(top: 20),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Text(
+                            dataa.get("name"),
+                            style: TextStyle(
                                 fontSize: 20,
-                              ),
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Text(
+                            dataa.get("description"),
+                            overflow: TextOverflow.clip,
+                            style: TextStyle(
+                              fontSize: 20,
                             ),
                           ),
-                          Container(
-                            child: Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: Center(
-                                child: Text(
-                                  dataa.get("location"),
-                                  overflow: TextOverflow.clip,
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                  ),
+                        ),
+                        Container(
+                          child: Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Center(
+                              child: Text(
+                                dataa.get("location"),
+                                overflow: TextOverflow.clip,
+                                style: TextStyle(
+                                  fontSize: 20,
                                 ),
                               ),
                             ),
                           ),
-                        ],
-                      )),
-                )
-              ],
-            ),
+                        ),
+                      ],
+                    )),
+              )
+            ],
           ),
         ),
       ),

@@ -103,14 +103,11 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
               } else {
                 Navigator.of(context)
                     .push(MaterialPageRoute(builder: (BuildContext context) {
-                  return MyAddress(
-                    resturantStats: {
-                      "name": widget.ent_name,
-                      "pickup": widget.pickup,
-                      "resturant": widget.ent_id
-                    },
-                    originalcart: cart
-                  );
+                  return MyAddress(resturantStats: {
+                    "name": widget.ent_name,
+                    "pickup": widget.pickup,
+                    "resturant": widget.ent_id
+                  }, originalcart: cart);
                 }));
               }
             }),
@@ -123,9 +120,7 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
               child: Row(
                 children: <Widget>[
                   IconButton(
-                      icon: Icon(Icons.shopping_cart),
-                      color: Colors.white
-                      ),
+                      icon: Icon(Icons.shopping_cart), color: Colors.white),
                   Text(
                     " ${productIds.length.toString()}",
                     style: TextStyle(
@@ -146,8 +141,9 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
                     width: 150,
                     height: 150,
                     child: Image.network(
-                      "http://admin.dexgambia.com/shops/img?img="+widget.ent_img,
-                    // child: Image.asset(
+                      "http://admin.dexgambia.com/shops/img?img=" +
+                          widget.ent_img,
+                      // child: Image.asset(
                       // "assets/images/restaurants-jays-burger.png",
                       key: widget.key,
                       fit: BoxFit.cover,
@@ -297,9 +293,7 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
       onTap: () {},
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Expanded(
-            // margin: EdgeInsets.all(10),
-            child: Stack(
+        child: Stack(
           alignment: Alignment.center,
           children: <Widget>[
             Container(
@@ -383,12 +377,11 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
                           Future.delayed(Duration(seconds: 1), () {
                             setState(() {
                               cart.addAll({
-                                "${dataa.get("product_name").toString()}":{
-                                  "price":dataa.get("product_price"),
-                                  "image":dataa.get("product_image"),
-                                  "quantity":1,
+                                "${dataa.get("product_name").toString()}": {
+                                  "price": dataa.get("product_price"),
+                                  "image": dataa.get("product_image"),
+                                  "quantity": 1,
                                 },
-                              
                               });
                               // cart.addEntries({
                               //   dataa.get("name").toString():
@@ -420,7 +413,7 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
                       }),
                 )),
           ],
-        )),
+        ),
       ),
     );
   }
@@ -541,7 +534,7 @@ class _DetailedEntityViewState extends State<DetailedEntityView> {
     print("markets/${widget.ent_id}/products");
     return FirebaseFirestore.instance
         .collection("markets/${widget.ent_id}/products")
-        .where('product_visible', isEqualTo : "on")
+        .where('product_visible', isEqualTo: "on")
         .get();
   }
 }

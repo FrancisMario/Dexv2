@@ -29,7 +29,6 @@ class _MyAddressState extends State<MyAddress> {
     () => 'Data Loaded',
   );
 
- 
   _future() {
     User user = auth.currentUser;
     return FirebaseFirestore.instance
@@ -88,7 +87,7 @@ class _MyAddressState extends State<MyAddress> {
         //                       ),
         //                     ),
         //                   ),
-                 
+
         //                 ],
         //               ),
         //               margin: EdgeInsets.only(bottom: 50, left: 12, right: 12),
@@ -129,9 +128,8 @@ class _MyAddressState extends State<MyAddress> {
                 return Center(
                   child: Padding(
                     padding: const EdgeInsets.all(50.0),
-                    child: Text(
-                        ""),
-                        // "No Contact Addresses yet. Use the button below to add new addresses"),
+                    child: Text(""),
+                    // "No Contact Addresses yet. Use the button below to add new addresses"),
                   ),
                 );
               }
@@ -143,7 +141,9 @@ class _MyAddressState extends State<MyAddress> {
                     itemCount: ss.length,
                     itemBuilder: (context, index) {
                       // return Card(ss[index], context);
-                      return Text("",);
+                      return Text(
+                        "",
+                      );
                     }),
               );
               // print(ss.data());
@@ -174,13 +174,11 @@ class _MyAddressState extends State<MyAddress> {
                     Expanded(
                         child: GestureDetector(
                       onTap: () {
-                        if(!_loading){
+                        if (!_loading) {
                           this._loading = true;
                           fetchPlaces();
-                          }
-                          setState(() {
-                            
-                          });
+                        }
+                        setState(() {});
                         // getAddress();
                       },
                       child: widget.originalcart != null
@@ -188,12 +186,15 @@ class _MyAddressState extends State<MyAddress> {
                               height: MediaQuery.of(context).size.width / 4,
                               color: Colors.red,
                               child: Center(
-                                child: !_loading ? Text(
-                                  "Deliver Here",
-                                  // "Deliver To Current Location",
-                                  style: TextStyle(
-                                      fontSize: 25, color: Colors.white),
-                                ) : CircularProgressIndicator(backgroundColor:Colors.white),
+                                child: !_loading
+                                    ? Text(
+                                        "Deliver Here",
+                                        // "Deliver To Current Location",
+                                        style: TextStyle(
+                                            fontSize: 25, color: Colors.white),
+                                      )
+                                    : CircularProgressIndicator(
+                                        backgroundColor: Colors.white),
                               ),
                             )
                           : Text("oij"),
@@ -645,7 +646,7 @@ class _MyAddressState extends State<MyAddress> {
   _selectLocation(context) async {
     showDialog(
         context: context,
-        barrierDismissible:false,
+        barrierDismissible: false,
         builder: (context) => new AlertDialog(
               title: new Text("Select Current Location"),
               content: new Container(
@@ -660,10 +661,10 @@ class _MyAddressState extends State<MyAddress> {
                     child: DropdownButton<String>(
                         // value: _pickupLocation,
                         style: TextStyle(
-                                fontSize:20,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white,
-                              ),
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
                         dropdownColor: Colors.redAccent,
                         elevation: 10,
                         hint: Text(
@@ -678,7 +679,7 @@ class _MyAddressState extends State<MyAddress> {
                           print("dropdown value: $newValue");
                           setPrice(newValue);
                           setState(() {
-                          _pickupLocation = newValue;
+                            _pickupLocation = newValue;
                           });
                           refresh();
                           // Navigator.of(context).pop();
@@ -688,9 +689,8 @@ class _MyAddressState extends State<MyAddress> {
                           // print(value["price"] + "=>" + value["price"]);
                           return DropdownMenuItem<String>(
                             value: value["name"],
-                            child: Expanded(
-                              // color: Colors.white,
-                              child: Text(value["name"],),
+                            child: Text(
+                              value["name"],
                             ),
                           );
                         }).toList()),
@@ -702,8 +702,7 @@ class _MyAddressState extends State<MyAddress> {
                   child: Text('Cancel'),
                   onPressed: () {
                     this._loading = false;
-                    setState(() {
-                    });
+                    setState(() {});
                     Navigator.of(context).pop();
                   },
                 ),
@@ -725,16 +724,15 @@ class _MyAddressState extends State<MyAddress> {
   fetchPlaces() {
     print("hello");
     // making sure the places dont load twice
-    if(this._places.isNotEmpty){
-          _selectLocation(context);
-          return;
+    if (this._places.isNotEmpty) {
+      _selectLocation(context);
+      return;
     }
-    var string = http
-        .get('http://admin.dexgambia.com/locations/')
-        .then((value) {
-          this._places = jsonDecode(value.body);
-          _selectLocation(context);
-          });
+    var string =
+        http.get('http://admin.dexgambia.com/locations/').then((value) {
+      this._places = jsonDecode(value.body);
+      _selectLocation(context);
+    });
     this._places.forEach((element) {
       print(element["name"]);
     });
@@ -743,21 +741,21 @@ class _MyAddressState extends State<MyAddress> {
   setPrice(String name) {
     // var element = _places.singleWhere((element) => element[name]);
     // this._price = element["price"];
-    var response = this._places.singleWhere((element) => element["name"] == name);
+    var response =
+        this._places.singleWhere((element) => element["name"] == name);
     this._price = response["price"];
     print("price :" + response["price"].toString());
-
   }
-     // Am ashamed of this code right here
-    refresh() {
-      Navigator.of(context).pop();
-      _selectLocation(context);
-    }
+
+  // Am ashamed of this code right here
+  refresh() {
+    Navigator.of(context).pop();
+    _selectLocation(context);
+  }
+
   _proceedToCheckout(address) async {
     this._loading = false;
-    setState(() {
-      
-    });
+    setState(() {});
     User user = auth.currentUser;
     Navigator.of(context).push(
       MaterialPageRoute(builder: (BuildContext context) {
@@ -773,7 +771,5 @@ class _MyAddressState extends State<MyAddress> {
         );
       }),
     );
- 
-
   }
 }

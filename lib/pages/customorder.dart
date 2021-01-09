@@ -181,11 +181,8 @@ class _CustomOrderState extends State<CustomOrder> {
                       // print(value["price"] + "=>" + value["price"]);
                       return DropdownMenuItem<String>(
                         value: value["name"],
-                        child: Expanded(
-                          // color: Colors.white,
-                          child: Text(
-                            value["name"],
-                          ),
+                        child: Text(
+                          value["name"],
                         ),
                       );
                     }).toList()),
@@ -437,11 +434,8 @@ class _CustomOrderState extends State<CustomOrder> {
                       // print(value["price"] + "=>" + value["price"]);
                       return DropdownMenuItem<String>(
                         value: value["name"],
-                        child: Expanded(
-                          // color: Colors.white,
-                          child: Text(
-                            value["name"],
-                          ),
+                        child: Text(
+                          value["name"],
                         ),
                       );
                     }).toList()),

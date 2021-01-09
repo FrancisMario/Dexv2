@@ -4,3 +4,12 @@
   C:\Users\Administrator\Documents\dexv2\android\app\src\nullnull\debug\google-services.json
   C:\Users\Administrator\Documents\dexv2\android\app\src\debug\nullnull\google-services.json
   C:\Users\Administrator\Documents\dexv2\android\app\google-services.json
+
+
+  Problem of not bulilding offline,, 
+    solution one
+        ran this
+            ./gradlew wrapper --gradle-version=6.6-branch-ljacomet_dependency_management_graph_invalid-20200605145923+0000
+
+Solution two
+    try to find the latest gradle distributionUrl

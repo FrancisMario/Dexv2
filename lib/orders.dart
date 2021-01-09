@@ -17,13 +17,8 @@ class _OrdersState extends State<Orders> {
   FirebaseAuth auth = FirebaseAuth.instance;
 
   // A temporary solution to the redirect the user
-  void checkOrderState() {
+  void checkOrderState(BuildContext context) {
     if (widget.order_placed) {
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (BuildContext context) {
-        return TrackOrders();
-      }));
-
       Navigator.of(context)
           .push(MaterialPageRoute(builder: (BuildContext context) {
         return TrackOrders(placed: true);
@@ -34,7 +29,7 @@ class _OrdersState extends State<Orders> {
   @override
   Widget build(BuildContext context) {
     User user = auth.currentUser;
-    checkOrderState();
+    checkOrderState(context);
     return Scaffold(
       body: CustomScrollView(
         physics: BouncingScrollPhysics(),
